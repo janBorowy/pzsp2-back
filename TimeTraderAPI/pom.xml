@@ -51,14 +51,16 @@
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 			<version>3.2.5</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/com.github.eirslett/frontend-maven-plugin -->
 		<dependency>
-			<groupId>com.github.eirslett</groupId>
-			<artifactId>frontend-maven-plugin</artifactId>
-			<version>1.15.0</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+			<version>3.2.5</version>
 		</dependency>
-
-
+		<dependency>
+			<groupId>org.thymeleaf.extras</groupId>
+			<artifactId>thymeleaf-extras-springsecurity5</artifactId>
+			<version>3.1.2.RELEASE</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -66,6 +68,7 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>3.2.5</version>
 				<configuration>
 					<excludes>
 						<exclude>
@@ -79,6 +82,7 @@
 			<plugin>
 				<groupId>com.github.eirslett</groupId>
 				<artifactId>frontend-maven-plugin</artifactId>
+				<version>1.15.0</version>
 			</plugin>
 			<!-- end::frontend-maven-plugin[] -->
 		</plugins>
