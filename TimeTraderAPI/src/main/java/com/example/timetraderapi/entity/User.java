@@ -39,4 +39,7 @@ public class User {
     @OneToMany(mappedBy = "buyer", fetch = FetchType.LAZY)
     private List<Trade> listTrades = new ArrayList<>();
 
+    @OneToMany(mappedBy = "seller", fetch = FetchType.LAZY)
+    private List<TradeOffer> listTradeOffers = new ArrayList<>();
+
 }
