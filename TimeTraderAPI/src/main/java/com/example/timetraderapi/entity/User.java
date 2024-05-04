@@ -2,8 +2,9 @@ package com.example.timetraderapi.entity;
 
 
 import jakarta.persistence.*;
-import jakarta.websocket.server.ServerEndpoint;
 import lombok.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +16,8 @@ import java.util.List;
 @Entity
 @Table(name="users")
 public class User {
+
+    public static final PasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder();
 
     @Id
     private String login;
@@ -41,5 +44,9 @@ public class User {
 
     @OneToMany(mappedBy = "seller", fetch = FetchType.LAZY)
     private List<TradeOffer> listTradeOffers = new ArrayList<>();
+
+    public void setPassword(String password) {
+        this.password = PASSWORD_ENCODER.encode(password);
+    }
 
 }
