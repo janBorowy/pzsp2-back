@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.cglib.core.Local;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -22,10 +24,10 @@ public class TimeSlot {
     private Long id;
 
     @Column(nullable = false)
-    private Date startTime;
+    private LocalDateTime startTime;
 
     @Column(nullable = false)
-    private Date endTime;
+    private LocalDateTime endTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user.login")

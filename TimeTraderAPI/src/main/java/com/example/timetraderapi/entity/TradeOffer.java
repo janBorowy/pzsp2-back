@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Getter
@@ -29,7 +30,7 @@ public class TradeOffer {
 
     private Integer state;
 
-    private Date timestamp;
+    private LocalDateTime timestamp;
 
     @OneToOne(mappedBy = "tradeOffer", fetch = FetchType.LAZY)
     private Trade trade;

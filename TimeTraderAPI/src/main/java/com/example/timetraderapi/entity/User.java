@@ -29,6 +29,8 @@ public class User {
     private Boolean ifAdmin;
 
     @Column(unique = true)
+    private Integer balance;
+
     private String email;
 
     private String name;
