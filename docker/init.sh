@@ -1,0 +1,1 @@
+sudo mkdir -p /var/lib/postgresql/data
