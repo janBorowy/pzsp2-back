@@ -1,0 +1,33 @@
+POST {{url}}/auth/signup
+Content-Type: application/json
+
+{
+  "login": "user",
+  "password": "user",
+  "email": "somemail@mail.com",
+  "name": "hello",
+  "surname": "there",
+  "groupId": 1
+}
+
+###
+
+POST {{url}}/auth/signin
+Content-Type: application/json
+
+{
+  "login": "user",
+  "password": "user"
+}
+
+###
+
+GET {{url}}/users
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyIiwibG9naW4iOiJ1c2VyIiwiZXhwIjoxNzE1NDgwMzkwfQ.deeQRuL0eR9k_VlL7h6a8UioO5fRnVBdz108RnIMyZ4
+
+###
+
+GET {{url}}/users/user1
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyIiwibG9naW4iOiJ1c2VyIiwiZXhwIjoxNzE1NDgwMzkwfQ.deeQRuL0eR9k_VlL7h6a8UioO5fRnVBdz108RnIMyZ4
