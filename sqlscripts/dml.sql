@@ -1,7 +1,7 @@
 -- Inserting sample data into the 'users' table
 INSERT INTO groups (name) VALUES ('Group A'), ('Group B');
 
-INSERT INTO users (login, password, is_admin, email, name, surname, group_id)
+INSERT INTO users (login, hashed_password, is_admin, email, name, surname, group_id)
 VALUES
     ('user1', 'password1', false, 'user1@example.com', 'John', 'Doe', 1),
     ('user2', 'password2', false, 'user2@example.com', 'Jane', 'Smith', 1),

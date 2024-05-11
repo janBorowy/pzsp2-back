@@ -4,7 +4,7 @@ CREATE SCHEMA public;
 CREATE TABLE users
 (
     login text PRIMARY KEY,
-    password text NOT NULL,
+    hashed_password text NOT NULL,
     is_admin boolean NOT NULL,
     email text UNIQUE NOT NULL,
     name text,
