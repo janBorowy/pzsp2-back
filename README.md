@@ -7,3 +7,13 @@ grafiku. Dostępna jest funkcjonalność optymalizacji grafiku pod kątem zadowo
 uczestników. W tym celu uczestnicy składają w systemie transakcje wymiany terminami,
 które system przegląda i dostosowuje grafik. Dostęp do aplikacji odbywa się
 poprzez stronę internetową.
+
+## Docker
+```
+cd docker
+docker compose up -d
+```
+Wejdź do psql:
+```
+docker exec -it postgres sh -c "psql -d timeTrader -U admin -W"
+```
