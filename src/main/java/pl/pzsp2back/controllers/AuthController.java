@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,16 +28,26 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> singUp(@RequestBody SignUpDto dto) {
-        service.signUp(dto);
+        try {
+            service.signUp(dto);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(e.getMessage());
+        }
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<TokenDto> signIn(@RequestBody SignInDto dto) {
-        var usernamePassword = new UsernamePasswordAuthenticationToken(dto.login(), dto.password());
-        var authUser = authenticationManager.authenticate(usernamePassword);
-        var accessToken = tokenService.generateAccessToken((User) authUser.getPrincipal());
-        return ResponseEntity.ok(new TokenDto(accessToken));
+    public ResponseEntity<?> signIn(@RequestBody SignInDto dto) {
+        try {
+            var usernamePassword = new UsernamePasswordAuthenticationToken(dto.login(), dto.password());
+            var authUser = authenticationManager.authenticate(usernamePassword);
+            var accessToken = tokenService.generateAccessToken((User) authUser.getPrincipal());
+            return ResponseEntity.ok(new TokenDto(accessToken));
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(e.getMessage());
+        }
     }
 
 }
