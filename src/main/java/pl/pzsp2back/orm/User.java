@@ -12,6 +12,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Getter
+@Setter
 @Entity
 @Table(name = "users")
 @AllArgsConstructor
@@ -22,16 +23,12 @@ public class User implements UserDetails {
 
     private String hashedPassword;
 
-    @Setter
     private boolean isAdmin;
 
-    @Setter
     private String email;
 
-    @Setter
     private String name;
 
-    @Setter
     private String surname;
 
     private Integer groupId;

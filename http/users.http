@@ -22,12 +22,29 @@ Content-Type: application/json
 
 ###
 
-GET {{url}}/users
+GET {{url}}/users/user1
 Accept: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyIiwibG9naW4iOiJ1c2VyIiwiZXhwIjoxNzE1NDgwMzkwfQ.deeQRuL0eR9k_VlL7h6a8UioO5fRnVBdz108RnIMyZ4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyIiwibG9naW4iOiJ1c2VyIiwiZXhwIjoxNzE1NTczNzIwfQ.HvNbmn5KlOWms0N5VkZh_wHXXSzbH28gsZv1s7wScq0
+
+{
+}
+###
+
+PUT {{url}}//users
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyIiwibG9naW4iOiJ1c2VyIiwiZXhwIjoxNzE1NTczNzIwfQ.HvNbmn5KlOWms0N5VkZh_wHXXSzbH28gsZv1s7wScq0
+
+{
+  "login": "user",
+  "email": "hollo@mail.com",
+  "name": "Jan",
+  "surname": "Kowalski",
+  "groupId": 2
+}
 
 ###
 
-GET {{url}}/users/user1
+DELETE {{url}}/users/user
 Accept: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyIiwibG9naW4iOiJ1c2VyIiwiZXhwIjoxNzE1NDgwMzkwfQ.deeQRuL0eR9k_VlL7h6a8UioO5fRnVBdz108RnIMyZ4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyIiwibG9naW4iOiJ1c2VyIiwiZXhwIjoxNzE1NTczNzIwfQ.HvNbmn5KlOWms0N5VkZh_wHXXSzbH28gsZv1s7wScq0
