@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.pzsp2back.dto.SignInDto;
 import pl.pzsp2back.dto.SignUpDto;
 import pl.pzsp2back.dto.TokenDto;
+import pl.pzsp2back.exceptions.AuthException;
 import pl.pzsp2back.orm.User;
 import pl.pzsp2back.security.AuthService;
 import pl.pzsp2back.security.TokenProvider;
@@ -28,12 +29,7 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> singUp(@RequestBody SignUpDto dto) {
-        try {
-            service.signUp(dto);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(e.getMessage());
-        }
+        service.signUp(dto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

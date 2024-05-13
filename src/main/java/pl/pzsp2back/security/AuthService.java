@@ -7,6 +7,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.pzsp2back.dto.SignUpDto;
+import pl.pzsp2back.exceptions.UserAlreadyExists;
+import pl.pzsp2back.exceptions.UserServiceException;
+import pl.pzsp2back.orm.GroupRepository;
 import pl.pzsp2back.orm.User;
 import pl.pzsp2back.orm.UserRepository;
 
@@ -15,6 +18,7 @@ import pl.pzsp2back.orm.UserRepository;
 public class AuthService implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final GroupRepository groupRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) {
@@ -24,10 +28,12 @@ public class AuthService implements UserDetailsService {
 
     public UserDetails signUp(SignUpDto dto) {
         if (userRepository.findById(dto.login()).isPresent()) {
-            throw new RuntimeException("User already exists");
+            throw new UserAlreadyExists();
         }
         String hashedPassword = new BCryptPasswordEncoder().encode(dto.password());
-        User newUser = new User(dto.login(), hashedPassword, false, dto.email(), dto.name(), dto.surname(), dto.groupId());
+        var group = groupRepository.findById(dto.groupId())
+                .orElseThrow(() -> new UserServiceException("Group with given id does not exist"));
+        User newUser = new User(dto.login(), hashedPassword, false, 0, dto.email(), dto.name(), dto.surname(), group, null, null);
         return userRepository.save(newUser);
     }
 }

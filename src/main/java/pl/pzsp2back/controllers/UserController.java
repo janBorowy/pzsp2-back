@@ -1,5 +1,6 @@
 package pl.pzsp2back.controllers;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,7 +33,7 @@ public class UserController {
     }
 
     @PutMapping("/users")
-    public ResponseEntity<?> putUser(@RequestBody User user) {
+    public ResponseEntity<?> putUser(@Valid @RequestBody User user) {
         try {
             var updatedUser = userService.updateUser(user.getLogin(), user);
             return ResponseEntity.ok(updatedUser);

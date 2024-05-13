@@ -18,6 +18,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa:${springVersion}")
     implementation("org.springframework.boot:spring-boot-starter-security:${springVersion}")
     implementation("org.springframework.boot:spring-boot-starter-test:${springVersion}")
+    implementation("org.springframework.boot:spring-boot-starter-validation:${springVersion}")
     implementation("org.postgresql:postgresql:42.7.3")
     implementation("com.auth0:java-jwt:4.4.0")
     testImplementation("org.assertj:assertj-core:3.25.3")

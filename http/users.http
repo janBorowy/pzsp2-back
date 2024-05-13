@@ -2,9 +2,9 @@ POST {{url}}/auth/signup
 Content-Type: application/json
 
 {
-  "login": "user",
-  "password": "user",
-  "email": "somemail@mail.com",
+  "login": "user56",
+  "password": "user56",
+  "email": "somemailo@mail.com",
   "name": "hello",
   "surname": "there",
   "groupId": 1
@@ -16,15 +16,15 @@ POST {{url}}/auth/signin
 Content-Type: application/json
 
 {
-  "login": "user",
-  "password": "user"
+  "login": "user5",
+  "password": "user5"
 }
 
 ###
 
-GET {{url}}/users/user1
+GET {{url}}/users/user56
 Accept: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyIiwibG9naW4iOiJ1c2VyIiwiZXhwIjoxNzE1NTczNzIwfQ.HvNbmn5KlOWms0N5VkZh_wHXXSzbH28gsZv1s7wScq0
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyNSIsImxvZ2luIjoidXNlcjUiLCJleHAiOjE3MTU2MzYxNTl9.DK10GOvyvr5Mz7r_-P1jS7e0IMNTL1AGXhx_p_c8OB4
 
 {
 }
@@ -33,11 +33,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyIiwib
 PUT {{url}}//users
 Accept: application/json
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyIiwibG9naW4iOiJ1c2VyIiwiZXhwIjoxNzE1NTczNzIwfQ.HvNbmn5KlOWms0N5VkZh_wHXXSzbH28gsZv1s7wScq0
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyNSIsImxvZ2luIjoidXNlcjUiLCJleHAiOjE3MTU2MzYxNTl9.DK10GOvyvr5Mz7r_-P1jS7e0IMNTL1AGXhx_p_c8OB4
 
 {
-  "login": "user",
-  "email": "hollo@mail.com",
+  "login": "user56",
+  "email": "hol3lo@mail.com",
   "name": "Jan",
   "surname": "Kowalski",
   "groupId": 2
@@ -45,6 +45,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyIiwib
 
 ###
 
-DELETE {{url}}/users/user
+DELETE {{url}}/users/user56
 Accept: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyIiwibG9naW4iOiJ1c2VyIiwiZXhwIjoxNzE1NTczNzIwfQ.HvNbmn5KlOWms0N5VkZh_wHXXSzbH28gsZv1s7wScq0
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyNSIsImxvZ2luIjoidXNlcjUiLCJleHAiOjE3MTU2MzYxNTl9.DK10GOvyvr5Mz7r_-P1jS7e0IMNTL1AGXhx_p_c8OB4

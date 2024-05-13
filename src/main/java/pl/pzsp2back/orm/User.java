@@ -1,29 +1,45 @@
 package pl.pzsp2back.orm;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Getter
 @Setter
-@Entity
-@Table(name = "users")
+@NoArgsConstructor
 @AllArgsConstructor
-public class User implements UserDetails {
-
+@Entity
+@Table(name="users")
+public class User implements UserDetails{
     @Id
     private String login;
 
+    @Column(nullable = false)
     private String hashedPassword;
 
-    private boolean isAdmin;
+    @Column(nullable = false)
+    private Boolean ifAdmin;
+
+    @Column(unique = true)
+    private Integer balance;
 
     private String email;
 
@@ -31,9 +47,15 @@ public class User implements UserDetails {
 
     private String surname;
 
-    private Integer groupId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "group.id", nullable = false)
+    private Group group;
 
-    public User() {}
+    @OneToMany(mappedBy = "buyer", fetch = FetchType.LAZY)
+    private List<Trade> listTrades = new ArrayList<>();
+
+    @OneToMany(mappedBy = "seller", fetch = FetchType.LAZY)
+    private List<TradeOffer> listTradeOffers = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -69,4 +91,5 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 }

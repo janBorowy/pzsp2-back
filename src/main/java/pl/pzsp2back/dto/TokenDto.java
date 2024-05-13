@@ -1,3 +1,5 @@
 package pl.pzsp2back.dto;
 
-public record TokenDto(String token) {}
+import jakarta.validation.constraints.NotNull;
+
+public record TokenDto(@NotNull String token) {}
