@@ -2,9 +2,9 @@ POST {{url}}/auth/signup
 Content-Type: application/json
 
 {
-  "login": "user56",
-  "password": "user56",
-  "email": "somemailo@mail.com",
+  "login": "user6",
+  "password": "user6",
+  "email": "somemailjhgo@mail.com",
   "name": "hello",
   "surname": "there",
   "groupId": 1
