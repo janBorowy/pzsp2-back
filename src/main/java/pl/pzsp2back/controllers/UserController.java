@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import pl.pzsp2back.exceptions.UserServiceException;
 import pl.pzsp2back.orm.User;
-import pl.pzsp2back.security.UserService;
+import pl.pzsp2back.services.UserService;
 
 @RestController()
 @AllArgsConstructor

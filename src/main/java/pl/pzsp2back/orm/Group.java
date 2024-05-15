@@ -1,5 +1,6 @@
 package pl.pzsp2back.orm;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,6 +24,7 @@ public class Group {
     @Column(nullable = false)
     private String name;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
     private List<User> usersList = new ArrayList<>();
 

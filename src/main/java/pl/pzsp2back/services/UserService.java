@@ -1,4 +1,4 @@
-package pl.pzsp2back.security;
+package pl.pzsp2back.services;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
