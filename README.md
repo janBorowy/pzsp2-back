@@ -17,3 +17,8 @@ Wejdź do psql:
 ```
 docker exec -it postgres sh -c "psql -d timeTrader -U admin -W"
 ```
+
+
+## Możliwe problemy do napotkania
+- pgAdmin uruchamia się w tle i trzeba wyłączyć jego proces
+- trzeba ustawić/stworzyć nowy schemat w bazie danych timeTrader
