@@ -24,22 +24,25 @@ public class TradeOffer {
     @Column(nullable = false)
     private Integer price;
 
-    @Column(name = "can_offer")
-    private Boolean canOffer;
-
-    private Integer state;
-
     private LocalDateTime timestamp;
 
-    @OneToOne(mappedBy = "tradeOffer", fetch = FetchType.LAZY)
-    private Trade trade;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seller.login")
-    private User seller;
+    @JoinColumn(name = "offerOwner.login")
+    private User offerOwner;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "timeslot.id")
     private TimeSlot timeslot;
+
+
+    @Column(name = "if_sell_offer")
+    private Boolean ifSellOffer;
+
+    private Boolean isActive;
+
+
+
+
 
 }

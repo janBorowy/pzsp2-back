@@ -23,11 +23,14 @@ public class TimeSlot {
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "start_time", nullable = false)
     private LocalDateTime startTime;
 
     @Column(nullable = false)
-    private LocalDateTime endTime;
+    private Integer baseSlotQuantity;
+
+    @Column(nullable = false)
+    private Integer lastMarketPrice;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user.login")

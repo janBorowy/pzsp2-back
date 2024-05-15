@@ -20,6 +20,10 @@ public class Schedule {
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
 
+    @Column(name="base_slot_length")
+    private Integer baseSlotLength;
+
+    private String name;
     private String tag;
 
     @ManyToOne(fetch = FetchType.LAZY)

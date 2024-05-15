@@ -15,12 +15,15 @@ import jakarta.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Getter
 @Setter
@@ -29,16 +32,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Entity
 @Table(name="users")
 public class User implements UserDetails{
+    public static final BCryptPasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder();
     @Id
     private String login;
-
     @Column(nullable = false)
     private String hashedPassword;
 
     @Column(nullable = false)
     private Boolean ifAdmin;
 
-    @Column(unique = true)
+    @Column(nullable = false)
     private Integer balance;
 
     private String email;
@@ -51,10 +54,8 @@ public class User implements UserDetails{
     @JoinColumn(name = "group.id", nullable = false)
     private Group group;
 
-    @OneToMany(mappedBy = "buyer", fetch = FetchType.LAZY)
-    private List<Trade> listTrades = new ArrayList<>();
 
-    @OneToMany(mappedBy = "seller", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "offerOwner", fetch = FetchType.LAZY)
     private List<TradeOffer> listTradeOffers = new ArrayList<>();
 
     @Override

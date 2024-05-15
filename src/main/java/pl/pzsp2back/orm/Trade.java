@@ -20,14 +20,24 @@ public class Trade {
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
 
+    @Column()
+    private Integer finalPrice;
+
     @Column(nullable = false)
     private LocalDateTime timestamp;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "buyer.login", nullable = false)
-    private User buyer;
+    @JoinColumn(name = "optimizationProcesses.id", nullable = false)
+    private OptimizationProcess optimizationProcess;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "offer.id", nullable = false)
-    private TradeOffer tradeOffer;
+    @JoinColumn(name = "sellerOffer.id", nullable = false)
+    private TradeOffer sellerOffer;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "buyerOffer.id", nullable = false)
+    private TradeOffer buyerOffer;
+
+
+
 }
