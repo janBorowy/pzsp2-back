@@ -21,6 +21,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation:${springVersion}")
     implementation("org.postgresql:postgresql:42.7.3")
     implementation("com.auth0:java-jwt:4.4.0")
+    // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
+
+
     testImplementation("org.assertj:assertj-core:3.25.3")
     testImplementation("com.h2database:h2:2.2.224")
 }

@@ -18,6 +18,8 @@ Wejdź do psql:
 docker exec -it postgres sh -c "psql -d timeTrader -U admin -W"
 ```
 
+## Swagger
+`http://localhost:8080/swagger-ui.html`
 
 ## Możliwe problemy do napotkania
 - pgAdmin uruchamia się w tle i trzeba wyłączyć jego proces
