@@ -21,4 +21,5 @@ docker exec -it postgres sh -c "psql -d timeTrader -U admin -W"
 
 ## Możliwe problemy do napotkania
 - pgAdmin uruchamia się w tle i trzeba wyłączyć jego proces
-- trzeba ustawić/stworzyć nowy schemat public w bazie danych timeTrader
+- trzeba ustawić/stworzyć nowy schemat `public` w bazie danych timeTrader
+- dodać plik .env do główego folderu i wstawić w niego np. `JWT_SECRET='5pAq6zRyX8bC3dV2wS7gN1mK9jF0hL4tUoP6iBvE3nG8xZaQrY7cW2fA'` 
