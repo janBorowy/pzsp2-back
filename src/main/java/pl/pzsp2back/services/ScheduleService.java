@@ -2,6 +2,7 @@ package pl.pzsp2back.services;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import pl.pzsp2back.dto.ScheduleDto;
 import pl.pzsp2back.exceptions.ScheduleServiceException;
 import pl.pzsp2back.orm.Schedule;
 import pl.pzsp2back.orm.ScheduleRepository;
@@ -25,6 +26,10 @@ public class ScheduleService {
         } else {
             throw new RuntimeException("Schedules not found");
         }
+    }
+
+    public static ScheduleDto mapToScheduleDto(Schedule schedule) {
+        return new ScheduleDto(schedule.getId(), schedule.getBaseSlotLength(), schedule.getName(), schedule.getTag(), schedule.getGroup().getName(), TimeSlotService.mapToGroupedTimeSlotsDto(schedule.getTimeSlotList()));
     }
 
 

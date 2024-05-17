@@ -7,12 +7,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import pl.pzsp2back.dto.ScheduleDto;
-import pl.pzsp2back.dto.TimeSlotDto;
 import pl.pzsp2back.exceptions.UserServiceException;
 import pl.pzsp2back.services.ScheduleService;
 
-import java.util.List;
-import java.util.stream.Collectors;
+
 
 @RestController
 @AllArgsConstructor
@@ -27,14 +25,9 @@ public class ScheduleController {
         }
         try {
             var schedules = scheduleService.getGroupSchedulesByLogin(login);
-            List<ScheduleDto> schedulesDtos = schedules.stream().
-                    map(s -> {
-                        List<TimeSlotDto> timeSlotDtos = s.getTimeSlotList().stream().map( ts -> new TimeSlotDto(ts.getId(), ts.getStartTime(), ts.getBaseSlotQuantity(), ts.getLastMarketPrice(), ts.getUser().getLogin(), null)).collect(Collectors.toList());
-                        return new ScheduleDto(s.getId(), s.getBaseSlotLength(), s.getName(), s.getTag(), s.getGroup().getName(), timeSlotDtos);
-                    }).
-                    collect(Collectors.toList());
+            ScheduleDto scheduleDto = ScheduleService.mapToScheduleDto(schedules.get(0));
 
-            return ResponseEntity.ok(schedulesDtos);
+            return ResponseEntity.ok(scheduleDto);
         } catch (UserServiceException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

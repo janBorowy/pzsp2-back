@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 import pl.pzsp2back.orm.*;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Component
 public class DatabaseLoader implements CommandLineRunner {
@@ -59,14 +58,14 @@ public class DatabaseLoader implements CommandLineRunner {
             this.timeslotRepository.save(
                     new TimeSlot(null, LocalDateTime.of(2024, 5, 7, 8, 30), 6, 0, worker1, test_schedule, null));
             this.timeslotRepository.save(
-                    new TimeSlot(null, LocalDateTime.of(2024, 5, 8, 11, 00), 2, 100, worker1, test_schedule, null));
+                    new TimeSlot(null, LocalDateTime.of(2024, 5, 8, 11, 0), 2, 1000, worker1, test_schedule, null));
             this.timeslotRepository.save(
                     new TimeSlot(null, LocalDateTime.of(2024, 5, 9, 9, 30), 5, 50, worker1, test_schedule, null));
             this.timeslotRepository.save(
                     new TimeSlot(null, LocalDateTime.of(2024, 5, 10, 15, 30), 8, 200, worker1, test_schedule, null));
 
             this.timeslotRepository.save(
-                    new TimeSlot(null, LocalDateTime.of(2024, 5, 7, 8, 30), 10, 1000, worker2, test_schedule, null));
+                    new TimeSlot(null, LocalDateTime.of(2024, 5, 8, 11, 0), 2, 1000, worker2, test_schedule, null));
             this.timeslotRepository.save(
                     new TimeSlot(null, LocalDateTime.of(2024, 5, 9, 8, 0), 3, 20, worker2, test_schedule, null));
         }
