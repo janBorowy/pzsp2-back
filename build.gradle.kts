@@ -24,8 +24,8 @@ dependencies {
     // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
 
-
-    testImplementation("org.assertj:assertj-core:3.25.3")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
+    testImplementation("org.assertj:assertj-core:3.6.1")
     testImplementation("com.h2database:h2:2.2.224")
 }
 

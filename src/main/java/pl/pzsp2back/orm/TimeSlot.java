@@ -5,11 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -42,4 +40,6 @@ public class TimeSlot {
 
     @OneToMany(mappedBy = "timeslot", fetch = FetchType.LAZY)
     private List<TradeOffer> tradeOfferList = new ArrayList<>();
+
+
 }
