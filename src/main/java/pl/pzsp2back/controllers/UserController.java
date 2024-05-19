@@ -4,24 +4,20 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.pzsp2back.exceptions.UserServiceException;
 import pl.pzsp2back.orm.User;
 import pl.pzsp2back.services.UserService;
 
 @RestController()
 @AllArgsConstructor
+@RequestMapping("/users")
 @Slf4j
 public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/users/{login}")
+    @GetMapping("/{login}")
     public ResponseEntity<?> findUserByLogin(@PathVariable("login") String login) {
         log.info("Fetch user %s");
         if (login.isEmpty()) {
@@ -35,7 +31,7 @@ public class UserController {
         }
     }
 
-    @PutMapping("/users")
+    @PutMapping("/")
     public ResponseEntity<?> putUser(@Valid @RequestBody User user) {
         try {
             var updatedUser = userService.updateUser(user.getLogin(), user);
@@ -45,7 +41,7 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/users/{login}")
+    @DeleteMapping("/{login}")
     public ResponseEntity<?> deleteUser(@PathVariable("login") String login) {
         try {
             var deletedUser = userService.deleteUser(login);

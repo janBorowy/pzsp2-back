@@ -16,6 +16,28 @@ public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final UserService userService;
 
+    public ScheduleDto updateSchedule(ScheduleDto scheduleDto) {
+        if(scheduleDto.id() == null) {
+            throw new ScheduleServiceException("Id not given.");
+        }
+        Schedule schedule = findScheduleById(scheduleDto.id());
+
+        if(scheduleDto.slotLength() != null){
+            schedule.setBaseSlotLength(scheduleDto.slotLength());
+        }
+        if(scheduleDto.scheduleName() != null) {
+            schedule.setName(scheduleDto.scheduleName());
+        }
+        if(scheduleDto.scheduleTag() != null){
+            schedule.setTag(scheduleDto.scheduleTag());
+        }
+        schedule = scheduleRepository.save(schedule);
+        return mapToScheduleDto(schedule);
+    }
+
+    public Schedule getSchedule(Long id) {
+        return findScheduleById(id);
+    }
 
     public List<Schedule> getGroupSchedulesByLogin(String login) throws RuntimeException {
         var user = userService.getUser(login);
