@@ -12,6 +12,9 @@ import pl.pzsp2back.exceptions.TimeSlotServiceException;
 import pl.pzsp2back.exceptions.UserServiceException;
 import pl.pzsp2back.services.TimeSlotService;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @AllArgsConstructor
 @RestController
 @RequestMapping("/timeslots")
@@ -41,6 +44,21 @@ public class TimeSlotController {
         }
     }
 
+    @PostMapping("/all")
+    public ResponseEntity<?> createTimeSlots(@Valid @RequestBody List<TimeSlotDto> timeSlotDtos) {
+        try {
+            List<TimeSlotDto> newTimeSlotDtos = new ArrayList<>();
+            for(var ts : timeSlotDtos)
+            {
+                newTimeSlotDtos.add(timeSlotService.createTimeSlot(ts));
+            }
+            return new ResponseEntity<>(newTimeSlotDtos, HttpStatus.CREATED);
+        } catch (TimeSlotServiceException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (UserServiceException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
     @PutMapping
     public ResponseEntity<?> updateTimeSlot(@Valid @RequestBody TimeSlotDto timeslotDto) {
