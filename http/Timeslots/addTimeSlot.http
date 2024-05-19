@@ -19,3 +19,15 @@ Content-Type: application/json
   "baseSlotQuantity" : 8,
   "userLogin" : "mati"
 }
+
+###
+
+POST http://localhost:8080/timeslots
+Content-Type: application/json
+
+{
+  "startTime" : "2024-05-06T11:45:00",
+  "baseSlotQuantity" : 10,
+  "lastMarketPrice" : 100,
+  "userLogin" : "worker1"
+}

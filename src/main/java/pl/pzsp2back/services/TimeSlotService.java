@@ -26,7 +26,7 @@ public class TimeSlotService {
             return false;
         }
 
-        return !(timeSlotDto.baseSlotQuantity() >= 0);
+        return (timeSlotDto.baseSlotQuantity() >= 0);
     }
 
 
@@ -44,7 +44,12 @@ public class TimeSlotService {
         User user = userService.getUser(timeslotDto.userLogin());
         List<Schedule> schedules = user.getGroup().getSchedulesList();
 
-        TimeSlot ts = timeslotRepository.save(new TimeSlot(null, timeslotDto.startTime(), timeslotDto.baseSlotQuantity(), -1, user, schedules.get(0), null));
+        int lastMarketPrice = -1;
+        if(timeslotDto.lastMarketPrice() != null && timeslotDto.lastMarketPrice() >= 0 ) {
+            lastMarketPrice = timeslotDto.lastMarketPrice();
+        }
+
+        TimeSlot ts = timeslotRepository.save(new TimeSlot(null, timeslotDto.startTime(), timeslotDto.baseSlotQuantity(), lastMarketPrice, user, schedules.get(0), null));
         return TimeSlotService.mapToTimeSlotDto(ts);
     }
 
