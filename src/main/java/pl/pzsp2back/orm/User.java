@@ -9,18 +9,15 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Getter
 @Setter
@@ -29,7 +26,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @Entity
 @Table(name="users")
 public class User implements UserDetails{
-    public static final BCryptPasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder();
     @Id
     private String login;
     @Column(nullable = false)

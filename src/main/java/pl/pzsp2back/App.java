@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.Collections;
 
 @SpringBootApplication
-@PropertySource("file:${user.dir}/.env")
 public class App {
     public static void main(String[] args) {
         SpringApplication.run(App.class, args);

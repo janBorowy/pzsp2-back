@@ -2,6 +2,7 @@ package pl.pzsp2back.controllers;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.pzsp2back.exceptions.UserServiceException;
@@ -11,12 +12,14 @@ import pl.pzsp2back.services.UserService;
 @RestController()
 @AllArgsConstructor
 @RequestMapping("/users")
+@Slf4j
 public class UserController {
 
     private final UserService userService;
 
     @GetMapping("/{login}")
     public ResponseEntity<?> findUserByLogin(@PathVariable("login") String login) {
+        log.info("Fetch user %s");
         if (login.isEmpty()) {
             return ResponseEntity.badRequest().body("Login not specified");
         }

@@ -16,15 +16,15 @@ POST {{url}}/auth/signin
 Content-Type: application/json
 
 {
-  "login": "user5",
-  "password": "user5"
+  "login": "admin",
+  "password": "adminpass"
 }
 
 ###
 
-GET {{url}}/users/user56
+GET {{url}}/users/worker1
 Accept: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyNSIsImxvZ2luIjoidXNlcjUiLCJleHAiOjE3MTU2MzYxNTl9.DK10GOvyvr5Mz7r_-P1jS7e0IMNTL1AGXhx_p_c8OB4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImxvZ2luIjoiYWRtaW4iLCJleHAiOjE3MTYxNzE4Mjl9.Lcgrdd3rcQJMrja7_6tYkQwQgSnCqyNDJIyy7NOc0-k
 
 {
 }
@@ -45,6 +45,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyNSIsI
 
 ###
 
-DELETE {{url}}/users/user56
+DELETE {{url}}/users/worker1
 Accept: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyNSIsImxvZ2luIjoidXNlcjUiLCJleHAiOjE3MTU2MzYxNTl9.DK10GOvyvr5Mz7r_-P1jS7e0IMNTL1AGXhx_p_c8OB4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImxvZ2luIjoiYWRtaW4iLCJleHAiOjE3MTYxNzAzMjZ9.iZO1xSGtLaVpfLsyZo6p-vIELGNsGHzv96B9UazZ3_U
