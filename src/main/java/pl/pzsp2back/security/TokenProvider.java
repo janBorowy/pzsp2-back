@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Date;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import pl.pzsp2back.orm.User;
@@ -18,8 +19,11 @@ public class TokenProvider {
     @Value("${security.jwt.token.expiration-time-in-hours}")
     private int EXPIRATION_TIME_IN_HOURS;
 
-    @Value("${security.jwt.token.secret-key}")
-    private String JWT_SECRET;
+    private final String JWT_SECRET;
+
+    public TokenProvider() {
+        JWT_SECRET = RandomStringUtils.randomAlphabetic(32);
+    }
 
     public String generateAccessToken(User user) {
         return JWT.create()

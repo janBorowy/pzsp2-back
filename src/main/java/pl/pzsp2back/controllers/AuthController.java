@@ -46,9 +46,8 @@ public class AuthController {
             var usernamePassword = new UsernamePasswordAuthenticationToken(dto.login(), dto.password());
             var authUser = authenticationManager.authenticate(usernamePassword);
             var accessToken = tokenService.generateAccessToken((User) authUser.getPrincipal());
-            var user = userRepository.findById(dto.login()).get();
             log.info("Successfully signed in user %s".formatted(dto));
-            return ResponseEntity.ok(new TokenDto(accessToken, user.getIfAdmin()));
+            return ResponseEntity.ok(new TokenDto(accessToken, dto.login()));
         } catch (AuthenticationException e) {
             log.info("Failed authorization for user %s".formatted(dto));
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
