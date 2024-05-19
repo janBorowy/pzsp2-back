@@ -21,6 +21,7 @@ public class TimeSlotService {
 
     private final TimeslotRepository timeslotRepository;
     private final UserService userService;
+    private final ScheduleService scheduleService;
     private boolean validateTimeslotDto(TimeSlotDto timeSlotDto) {
         if (timeSlotDto.startTime() == null || timeSlotDto.baseSlotQuantity() == null || timeSlotDto.userLogin() == null) {
             return false;
@@ -77,4 +78,29 @@ public class TimeSlotService {
     }
 
 
+    public TimeSlotDto updateTimeSlot(TimeSlotDto timeslotDto) {
+        if (timeslotDto.id() == null) {
+            throw new TimeSlotServiceException("Id is null. It is obligatory to update timeslot.");
+        }
+
+        var timeslot = timeslotRepository.findById(timeslotDto.id()).orElseThrow(
+                () -> new TimeSlotServiceException("Timeslot not found with given id: " + timeslotDto.id())
+        );
+        if(timeslotDto.startTime() != null){
+            timeslot.setStartTime(timeslotDto.startTime());
+        }
+        if(timeslotDto.baseSlotQuantity() != null) {
+            timeslot.setBaseSlotQuantity(timeslotDto.baseSlotQuantity());
+        }
+        if(timeslotDto.lastMarketPrice() != null) {
+            timeslot.setLastMarketPrice(timeslotDto.lastMarketPrice());
+        }
+        if(timeslotDto.userLogin() != null && !timeslot.getUser().getLogin().equals(timeslotDto.userLogin())) {
+            User user = userService.getUser(timeslotDto.userLogin());
+            timeslot.setUser(user);
+        }
+        //not implemented changing schedule for timeslot
+        timeslot = timeslotRepository.save(timeslot);
+        return mapToTimeSlotDto(timeslot);
+    }
 }

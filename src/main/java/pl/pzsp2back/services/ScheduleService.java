@@ -17,6 +17,10 @@ public class ScheduleService {
     private final UserService userService;
 
 
+    public Schedule getSchedule(Long id) {
+        return findScheduleById(id);
+    }
+
     public List<Schedule> getGroupSchedulesByLogin(String login) throws RuntimeException {
         var user = userService.getUser(login);
         var groupSchedules = user.getGroup().getSchedulesList();

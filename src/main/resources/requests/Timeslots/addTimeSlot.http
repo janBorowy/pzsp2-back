@@ -10,12 +10,12 @@ Content-Type: application/json
 
 ###
 
+#invalid post method because userLogin doesnt exists
 POST http://localhost:8080/timeslots
 Content-Type: application/json
 
 {
   "startTime" : "2024-05-06T13:00:00",
   "baseSlotQuantity" : 8,
-  "lastMarketPrice" : 100,
   "userLogin" : "mati"
 }
