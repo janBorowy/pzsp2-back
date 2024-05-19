@@ -2,6 +2,7 @@ package pl.pzsp2back.controllers;
 
 
 import jakarta.validation.Valid;
+import jakarta.websocket.server.PathParam;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,16 @@ import pl.pzsp2back.services.TimeSlotService;
 public class TimeSlotController {
 
     private final TimeSlotService timeSlotService;
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getTimeSlot(@PathParam("id") Long id) {
+        try {
+            TimeSlotDto timeslot = timeSlotService.getTimeSlot(id);
+            return ResponseEntity.ok(timeslot);
+        } catch (TimeSlotServiceException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
     @PostMapping
     public ResponseEntity<?> createTimeSlot(@Valid @RequestBody TimeSlotDto timeslotDto) {

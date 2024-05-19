@@ -26,10 +26,13 @@ public class TimeSlotService {
             return false;
         }
 
-        if(timeSlotDto.baseSlotQuantity() <= 0) {
-            return false;
-        }
-        return true;
+        return !(timeSlotDto.baseSlotQuantity() >= 0);
+    }
+
+
+    public TimeSlotDto getTimeSlot(Long id) {
+        TimeSlot timeslot = findTimeSlotById(id);
+        return mapToTimeSlotDto(timeslot);
     }
 
 
@@ -75,7 +78,7 @@ public class TimeSlotService {
         return mapToTimeSlotDto(timeslot);
     }
 
-    public TimeSlot findTimeSlotById(Long id) {
+    private TimeSlot findTimeSlotById(Long id) {
         return timeslotRepository.findById(id).orElseThrow(
                 () -> new TimeSlotServiceException("Timeslot not found with given id: " + id)
         );
