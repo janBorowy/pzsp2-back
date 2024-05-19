@@ -16,8 +16,8 @@ POST {{url}}/auth/signin
 Content-Type: application/json
 
 {
-  "login": "user5",
-  "password": "user5"
+  "login": "admin",
+  "password": "adminpass"
 }
 
 ###
