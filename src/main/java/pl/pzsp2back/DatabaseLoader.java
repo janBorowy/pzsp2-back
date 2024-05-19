@@ -30,8 +30,7 @@ public class DatabaseLoader implements CommandLineRunner {
         Group test_group = this.groupRepository.findByName("Test");
 
         if (test_group == null) {
-            this.groupRepository.save(new Group(null, "Test", null, null));
-            test_group = this.groupRepository.findByName("Test");
+            test_group = this.groupRepository.save(new Group(null, "Test", null, null));;
         }
 
         User admin = new User("admin", User.PASSWORD_ENCODER.encode("adminpass"), true, 0, "admin@admin.com", "Marek", "Racibor", test_group, null);
@@ -47,12 +46,7 @@ public class DatabaseLoader implements CommandLineRunner {
         Schedule test_schedule = this.scheduleRepository.findByTag("test");
         if (test_schedule == null) {
             // id, baseSlotLength, name, tag, group, timeSlotList
-            this.scheduleRepository.save(new Schedule(null, 60, "19 week", "test", test_group, null));
-            test_schedule = this.scheduleRepository.findByTag("test");
-            if(test_schedule==null)
-            {
-                throw new Exception("Test schedule not found!");
-            }
+            test_schedule = this.scheduleRepository.save(new Schedule(null, 60, "19 week", "test", test_group, null));
             this.timeslotRepository.save(
                     new TimeSlot(null, LocalDateTime.of(2024, 5, 6, 10, 30), 4, 0, worker1, test_schedule, null));
             this.timeslotRepository.save(

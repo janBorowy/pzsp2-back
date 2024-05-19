@@ -4,7 +4,13 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.pzsp2back.dto.GroupedTimeSlotDto;
 import pl.pzsp2back.dto.ShortTimeSlotInfoDto;
+import pl.pzsp2back.dto.TimeSlotDto;
+import pl.pzsp2back.exceptions.TimeSlotServiceException;
+import pl.pzsp2back.exceptions.UserServiceException;
+import pl.pzsp2back.orm.Schedule;
 import pl.pzsp2back.orm.TimeSlot;
+import pl.pzsp2back.orm.TimeslotRepository;
+import pl.pzsp2back.orm.User;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -12,6 +18,38 @@ import java.util.*;
 @Service
 @AllArgsConstructor
 public class TimeSlotService {
+
+    private final TimeslotRepository timeslotRepository;
+    private final UserService userService;
+    private boolean validateTimeslotDto(TimeSlotDto timeSlotDto) {
+        if (timeSlotDto.startTime() == null || timeSlotDto.baseSlotQuantity() == null || timeSlotDto.userLogin() == null) {
+            return false;
+        }
+
+        if(timeSlotDto.baseSlotQuantity() <= 0) {
+            return false;
+        }
+        return true;
+    }
+
+
+    public TimeSlotDto createTimeSlot(TimeSlotDto timeslotDto) {
+        if (!validateTimeslotDto(timeslotDto)) {
+            throw new TimeSlotServiceException("Not enough data to create timeslot");
+        }
+
+        User user = userService.getUser(timeslotDto.userLogin());
+        List<Schedule> schedules = user.getGroup().getSchedulesList();
+
+        TimeSlot ts = timeslotRepository.save(new TimeSlot(null, timeslotDto.startTime(), timeslotDto.baseSlotQuantity(), -1, user, schedules.get(0), null));
+        return TimeSlotService.mapToTimeSlotDto(ts);
+    }
+
+
+    public static TimeSlotDto mapToTimeSlotDto(TimeSlot timeslot) {
+        return new TimeSlotDto(timeslot.getId(), timeslot.getStartTime(), timeslot.getBaseSlotQuantity(), timeslot.getLastMarketPrice(), timeslot.getUser().getLogin(), timeslot.getSchedule().getId());
+    }
+
     public static List<GroupedTimeSlotDto> mapToGroupedTimeSlotsDto(List<TimeSlot> timeslots)
     {
         timeslots.sort(Comparator.comparing(TimeSlot::getStartTime));
@@ -37,4 +75,6 @@ public class TimeSlotService {
         grupedTimeSlotDtos.add(new GroupedTimeSlotDto(idCounter, lastStartTime, slotsQuantity, marketPrice, shortTimeSlotInfoDtos.size(), false, shortTimeSlotInfoDtos));
         return grupedTimeSlotDtos;
     }
+
+
 }

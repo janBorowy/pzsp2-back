@@ -1,0 +1,21 @@
+POST http://localhost:8080/timeslots
+Content-Type: application/json
+
+{
+  "startTime" : "2024-05-06T11:45:00",
+  "baseSlotQuantity" : 10,
+  "userLogin" : "worker1"
+}
+
+
+###
+
+POST http://localhost:8080/timeslots
+Content-Type: application/json
+
+{
+  "startTime" : "2024-05-06T13:00:00",
+  "baseSlotQuantity" : 8,
+  "lastMarketPrice" : 100,
+  "userLogin" : "mati"
+}
