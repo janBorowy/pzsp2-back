@@ -48,6 +48,8 @@ public class DatabaseLoader implements CommandLineRunner {
         var admin = userRepository.findById(adminDto.login()).get();
         var worker1 = userRepository.findById(worker1Dto.login()).get();
         var worker2 = userRepository.findById(worker2Dto.login()).get();
+        admin.setIfAdmin(true);
+        userRepository.save(admin);
 
         Schedule test_schedule = this.scheduleRepository.findByTag("test");
         if (test_schedule == null) {

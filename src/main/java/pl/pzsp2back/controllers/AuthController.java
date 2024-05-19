@@ -1,6 +1,7 @@
 package pl.pzsp2back.controllers;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,6 +23,7 @@ import pl.pzsp2back.security.TokenProvider;
 @RestController
 @RequestMapping("/auth")
 @AllArgsConstructor
+@Slf4j
 public class AuthController {
     private AuthenticationManager authenticationManager;
     private AuthService service;
@@ -29,6 +31,7 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> singUp(@RequestBody SignUpDto dto) {
+        log.info("Signing up user %s".formatted(dto));
         service.signUp(dto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -36,11 +39,13 @@ public class AuthController {
     @PostMapping("/signin")
     public ResponseEntity<?> signIn(@RequestBody SignInDto dto) {
         try {
+            log.info("Signing in user %s".formatted(dto));
             var usernamePassword = new UsernamePasswordAuthenticationToken(dto.login(), dto.password());
             var authUser = authenticationManager.authenticate(usernamePassword);
             var accessToken = tokenService.generateAccessToken((User) authUser.getPrincipal());
             return ResponseEntity.ok(new TokenDto(accessToken));
         } catch (AuthenticationException e) {
+            log.info("Failed authorization for user %s".formatted(dto));
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(e.getMessage());
         }
