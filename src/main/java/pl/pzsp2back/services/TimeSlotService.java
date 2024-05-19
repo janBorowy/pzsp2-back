@@ -6,7 +6,6 @@ import pl.pzsp2back.dto.GroupedTimeSlotDto;
 import pl.pzsp2back.dto.ShortTimeSlotInfoDto;
 import pl.pzsp2back.dto.TimeSlotDto;
 import pl.pzsp2back.exceptions.TimeSlotServiceException;
-import pl.pzsp2back.exceptions.UserServiceException;
 import pl.pzsp2back.orm.Schedule;
 import pl.pzsp2back.orm.TimeSlot;
 import pl.pzsp2back.orm.TimeslotRepository;
@@ -46,6 +45,42 @@ public class TimeSlotService {
         return TimeSlotService.mapToTimeSlotDto(ts);
     }
 
+    public TimeSlotDto updateTimeSlot(TimeSlotDto timeslotDto) {
+        if (timeslotDto.id() == null) {
+            throw new TimeSlotServiceException("Id is null. It is obligatory to update timeslot.");
+        }
+
+        var timeslot = findTimeSlotById(timeslotDto.id());
+        if(timeslotDto.startTime() != null){
+            timeslot.setStartTime(timeslotDto.startTime());
+        }
+        if(timeslotDto.baseSlotQuantity() != null) {
+            timeslot.setBaseSlotQuantity(timeslotDto.baseSlotQuantity());
+        }
+        if(timeslotDto.lastMarketPrice() != null) {
+            timeslot.setLastMarketPrice(timeslotDto.lastMarketPrice());
+        }
+        if(timeslotDto.userLogin() != null && !timeslot.getUser().getLogin().equals(timeslotDto.userLogin())) {
+            User user = userService.getUser(timeslotDto.userLogin());
+            timeslot.setUser(user);
+        }
+        //not implemented changing schedule for timeslot
+        timeslot = timeslotRepository.save(timeslot);
+        return mapToTimeSlotDto(timeslot);
+    }
+
+    public TimeSlotDto deleteTimeSlot(Long id) {
+        TimeSlot timeslot = findTimeSlotById(id);
+        timeslotRepository.delete(timeslot);
+        return mapToTimeSlotDto(timeslot);
+    }
+
+    public TimeSlot findTimeSlotById(Long id) {
+        return timeslotRepository.findById(id).orElseThrow(
+                () -> new TimeSlotServiceException("Timeslot not found with given id: " + id)
+        );
+    }
+
 
     public static TimeSlotDto mapToTimeSlotDto(TimeSlot timeslot) {
         return new TimeSlotDto(timeslot.getId(), timeslot.getStartTime(), timeslot.getBaseSlotQuantity(), timeslot.getLastMarketPrice(), timeslot.getUser().getLogin(), timeslot.getSchedule().getId());
@@ -77,30 +112,4 @@ public class TimeSlotService {
         return grupedTimeSlotDtos;
     }
 
-
-    public TimeSlotDto updateTimeSlot(TimeSlotDto timeslotDto) {
-        if (timeslotDto.id() == null) {
-            throw new TimeSlotServiceException("Id is null. It is obligatory to update timeslot.");
-        }
-
-        var timeslot = timeslotRepository.findById(timeslotDto.id()).orElseThrow(
-                () -> new TimeSlotServiceException("Timeslot not found with given id: " + timeslotDto.id())
-        );
-        if(timeslotDto.startTime() != null){
-            timeslot.setStartTime(timeslotDto.startTime());
-        }
-        if(timeslotDto.baseSlotQuantity() != null) {
-            timeslot.setBaseSlotQuantity(timeslotDto.baseSlotQuantity());
-        }
-        if(timeslotDto.lastMarketPrice() != null) {
-            timeslot.setLastMarketPrice(timeslotDto.lastMarketPrice());
-        }
-        if(timeslotDto.userLogin() != null && !timeslot.getUser().getLogin().equals(timeslotDto.userLogin())) {
-            User user = userService.getUser(timeslotDto.userLogin());
-            timeslot.setUser(user);
-        }
-        //not implemented changing schedule for timeslot
-        timeslot = timeslotRepository.save(timeslot);
-        return mapToTimeSlotDto(timeslot);
-    }
 }
