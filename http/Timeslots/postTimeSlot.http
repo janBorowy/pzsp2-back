@@ -1,0 +1,199 @@
+#examples
+
+#post new time slot with one user
+POST http://localhost:8080/timeslots
+Content-Type: application/json
+
+{
+  "startTime" : "2024-05-05T11:45:00",
+  "baseSlotQuantity" : 10,
+  "users" : [
+    {
+      "userName" : "worker1"
+    }
+  ]
+}
+
+###
+
+#post new time slot with few user
+POST http://localhost:8080/timeslots
+Content-Type: application/json
+
+{
+  "startTime" : "2024-05-06T20:00:00",
+  "baseSlotQuantity" : 10,
+  "users" : [
+    {
+      "userName" : "worker1"
+    },
+    {
+      "userName" : "worker2"
+    }
+  ]
+}
+
+
+###
+
+#schedules/all  post few timeslots
+POST http://localhost:8080/timeslots/all
+Content-Type: application/json
+
+[
+  {
+    "startTime" : "2024-05-07T10:00:00",
+    "baseSlotQuantity" : 8,
+    "users" : [
+      {
+        "userName" : "worker1"
+      },
+      {
+        "userName" : "worker2"
+      }
+    ]
+  },
+  {
+    "startTime" : "2024-05-08T10:00:00",
+    "baseSlotQuantity" : 8,
+    "users" : [
+      {
+        "userName" : "worker1"
+      }
+    ]
+  }
+]
+
+
+###
+
+#post already existing slot with diffrent user from 1st example (run it before)
+#expected behaviour: override
+POST http://localhost:8080/timeslots
+Content-Type: application/json
+
+{
+  "startTime" : "2024-05-05T11:45:00",
+  "baseSlotQuantity" : 10,
+  "users" : [
+    {
+      "userName" : "worker2"
+    }
+  ]
+}
+
+###
+
+##################
+### Exceptions ###
+##################
+
+#invalid post method because userLogin doesnt exists
+#expected behaviour: user not found exception
+POST http://localhost:8080/timeslots
+Content-Type: application/json
+
+{
+  "startTime" : "2024-05-06T13:00:00",
+  "baseSlotQuantity" : 8,
+  "users" : [
+    {
+      "userName" : "NoExistInDatabase"
+    }
+  ]
+}
+
+###
+
+#not full data to create new timeslot
+#expected behaviour: not enough data exception
+POST http://localhost:8080/timeslots
+Content-Type: application/json
+
+{
+  "startTime" : "2024-05-06T13:00:00",
+  "users" : [
+    {
+      "userName" : "NoExistInDatabase"
+    }
+  ]
+}
+
+###
+#not full data to create new timeslot
+#expected behaviour: not enough data exception
+POST http://localhost:8080/timeslots
+Content-Type: application/json
+
+{
+  "baseSlotQuantity" : 8,
+  "users" : [
+    {
+      "userName" : "NoExistInDatabase"
+    }
+  ]
+}
+
+###
+
+#not full data to create new timeslot
+#expected behaviour: not enough data exception
+POST http://localhost:8080/timeslots
+Content-Type: application/json
+
+{
+  "startTime" : "2024-05-06T13:00:00",
+  "baseSlotQuantity" : 8
+}
+
+
+###
+
+#one invalid nickname in few users
+#expected behaviour: user not found
+POST http://localhost:8080/timeslots
+Content-Type: application/json
+
+  {
+    "startTime" : "2024-05-10T10:00:00",
+    "baseSlotQuantity" : 8,
+    "users" : [
+      {
+        "userName" : "worker1"
+      },
+      {
+        "userName" : "notInDatabase"
+      }
+    ]
+  }
+
+###
+
+#invalid user name in timeslots/all
+#expected behaviour: user not found exception
+POST http://localhost:8080/timeslots/all
+Content-Type: application/json
+
+[
+  {
+    "startTime" : "2024-05-07T10:00:00",
+    "baseSlotQuantity" : 8,
+    "users" : [
+      {
+        "userName" : "worker1"
+      },
+      {
+        "userName" : "worker2"
+      }
+    ]
+  },
+  {
+    "startTime" : "2024-05-08T10:00:00",
+    "baseSlotQuantity" : 8,
+    "users" : [
+      {
+        "userName" : "notInDataBase"
+      }
+    ]
+  }
+]

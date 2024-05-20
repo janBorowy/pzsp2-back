@@ -1,6 +1,9 @@
 package pl.pzsp2back.dto;
 
-import java.time.LocalDateTime;
+import pl.pzsp2back.orm.User;
 
-public record TimeSlotDto(Long id, LocalDateTime startTime, Integer baseSlotQuantity, Integer lastMarketPrice, String userLogin, Long scheduleId) {
+import java.time.LocalDateTime;
+import java.util.List;
+
+public record TimeSlotDto(Long id, LocalDateTime startTime, Integer baseSlotQuantity, Integer lastMarketPrice, List<UserShortDto> users, Long scheduleId) {
 }

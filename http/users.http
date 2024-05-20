@@ -12,7 +12,7 @@ Content-Type: application/json
 
 ###
 
-POST {{url}}/auth/signin
+POST localhost:8080/auth/signin
 Content-Type: application/json
 
 {

@@ -1,14 +1,8 @@
 package pl.pzsp2back.orm;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -52,6 +46,16 @@ public class User implements UserDetails{
     @OneToMany(mappedBy = "offerOwner", fetch = FetchType.LAZY)
     private List<TradeOffer> listTradeOffers = new ArrayList<>();
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "timeslot_user",
+            joinColumns = {
+                    @JoinColumn(name="user_login", referencedColumnName = "login")
+            },
+            inverseJoinColumns = {
+                    @JoinColumn(name="timeslot_id", referencedColumnName = "id")
+            })
+    private List<TimeSlot> timeSlots;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
@@ -84,6 +88,16 @@ public class User implements UserDetails{
 
     @Override
     public boolean isEnabled() {
+        return true;
+    }
+
+    public static boolean ifUsersHaveSameGroup(List<User> users){
+        Group group = users.get(0).getGroup();
+        for (User user : users) {
+            if (user.getGroup() != group) {
+                return false;
+            }
+        }
         return true;
     }
 

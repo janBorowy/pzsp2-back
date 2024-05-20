@@ -8,6 +8,7 @@ import pl.pzsp2back.orm.Schedule;
 import pl.pzsp2back.orm.ScheduleRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -51,7 +52,7 @@ public class ScheduleService {
     }
 
     public static ScheduleDto mapToScheduleDto(Schedule schedule) {
-        return new ScheduleDto(schedule.getId(), schedule.getBaseSlotLength(), schedule.getName(), schedule.getTag(), schedule.getGroup().getName(), TimeSlotService.mapToGroupedTimeSlotsDto(schedule.getTimeSlotList()));
+        return new ScheduleDto(schedule.getId(), schedule.getBaseSlotLength(), schedule.getName(), schedule.getTag(), schedule.getGroup().getName(), schedule.getTimeSlotList().stream().map(ts -> TimeSlotService.mapToTimeSlotDto(ts)).collect(Collectors.toList()));
     }
 
 

@@ -6,8 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.pzsp2back.exceptions.UserServiceException;
+import pl.pzsp2back.orm.Group;
 import pl.pzsp2back.orm.User;
 import pl.pzsp2back.services.UserService;
+
+import java.util.List;
 
 @RestController()
 @AllArgsConstructor

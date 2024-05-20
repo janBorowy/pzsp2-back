@@ -10,6 +10,9 @@ import pl.pzsp2back.exceptions.UserAlreadyExistsException;
 import pl.pzsp2back.orm.*;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Collections;
+
 import pl.pzsp2back.security.AuthService;
 
 @Component
@@ -55,20 +58,20 @@ public class DatabaseLoader implements CommandLineRunner {
             // id, baseSlotLength, name, tag, group, timeSlotList
             test_schedule = this.scheduleRepository.save(new Schedule(null, 60, "19 week", "test", test_group, null));
             this.timeslotRepository.save(
-                    new TimeSlot(null, LocalDateTime.of(2024, 5, 6, 10, 30), 4, 0, worker1, test_schedule, null));
+                    new TimeSlot(null, LocalDateTime.of(2024, 5, 6, 10, 30), 4, 0, test_schedule, Collections.singletonList(worker1), null));
             this.timeslotRepository.save(
-                    new TimeSlot(null, LocalDateTime.of(2024, 5, 7, 8, 30), 6, 0, worker1, test_schedule, null));
+                    new TimeSlot(null, LocalDateTime.of(2024, 5, 7, 8, 30), 6, 0, test_schedule, Collections.singletonList(worker1), null));
             this.timeslotRepository.save(
-                    new TimeSlot(null, LocalDateTime.of(2024, 5, 8, 11, 0), 2, 1000, worker1, test_schedule, null));
+                    new TimeSlot(null, LocalDateTime.of(2024, 5, 8, 11, 0), 2, 1000, test_schedule, Collections.singletonList(worker1), null));
             this.timeslotRepository.save(
-                    new TimeSlot(null, LocalDateTime.of(2024, 5, 9, 9, 30), 5, 50, worker1, test_schedule, null));
+                    new TimeSlot(null, LocalDateTime.of(2024, 5, 9, 9, 30), 5, 50, test_schedule, Collections.singletonList(worker1), null));
             this.timeslotRepository.save(
-                    new TimeSlot(null, LocalDateTime.of(2024, 5, 10, 15, 30), 8, 200, worker1, test_schedule, null));
+                    new TimeSlot(null, LocalDateTime.of(2024, 5, 10, 15, 30), 8, 200,test_schedule, Collections.singletonList(worker1), null));
 
             this.timeslotRepository.save(
-                    new TimeSlot(null, LocalDateTime.of(2024, 5, 8, 11, 0), 2, 1000, worker2, test_schedule, null));
+                    new TimeSlot(null, LocalDateTime.of(2024, 5, 8, 11, 0), 2, 1000, test_schedule, Collections.singletonList(worker2), null));
             this.timeslotRepository.save(
-                    new TimeSlot(null, LocalDateTime.of(2024, 5, 9, 8, 0), 3, 20, worker2, test_schedule, null));
+                    new TimeSlot(null, LocalDateTime.of(2024, 5, 9, 8, 0), 3, 20, test_schedule, Collections.singletonList(worker2), null));
         }
     }
 

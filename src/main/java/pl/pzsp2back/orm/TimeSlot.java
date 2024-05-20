@@ -31,15 +31,21 @@ public class TimeSlot {
     private Integer lastMarketPrice;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user.login")
-    private User user;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "schedule.id")
     private Schedule schedule;
 
-    @OneToMany(mappedBy = "timeslot", fetch = FetchType.LAZY)
-    private List<TradeOffer> tradeOfferList = new ArrayList<>();
+    @ManyToMany( fetch = FetchType.LAZY)
+    @JoinTable(name = "timeslot_user",
+            joinColumns = {
+                    @JoinColumn(name="timeslot_id", referencedColumnName = "id")
+            },
+            inverseJoinColumns = {
+                    @JoinColumn(name="user_login", referencedColumnName = "login")
+            })
+    private List<User> users;
 
+
+    @OneToMany( fetch = FetchType.LAZY)
+    private List<TradeOffer> tradeOfferList = new ArrayList<>();
 
 }

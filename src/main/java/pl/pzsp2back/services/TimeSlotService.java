@@ -6,13 +6,11 @@ import pl.pzsp2back.dto.GroupedTimeSlotDto;
 import pl.pzsp2back.dto.ShortTimeSlotInfoDto;
 import pl.pzsp2back.dto.TimeSlotDto;
 import pl.pzsp2back.exceptions.TimeSlotServiceException;
-import pl.pzsp2back.orm.Schedule;
-import pl.pzsp2back.orm.TimeSlot;
-import pl.pzsp2back.orm.TimeslotRepository;
-import pl.pzsp2back.orm.User;
+import pl.pzsp2back.orm.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -20,13 +18,12 @@ public class TimeSlotService {
 
     private final TimeslotRepository timeslotRepository;
     private final UserService userService;
-    private final ScheduleService scheduleService;
+
     private boolean validateTimeslotDto(TimeSlotDto timeSlotDto) {
-        if (timeSlotDto.startTime() == null || timeSlotDto.baseSlotQuantity() == null || timeSlotDto.userLogin() == null) {
+        if (timeSlotDto.startTime() == null || timeSlotDto.baseSlotQuantity() == null || timeSlotDto.users() == null) {
             return false;
         }
-
-        return (timeSlotDto.baseSlotQuantity() >= 0);
+        return true;
     }
 
 
@@ -41,17 +38,47 @@ public class TimeSlotService {
             throw new TimeSlotServiceException("Not enough data to create timeslot");
         }
 
-        User user = userService.getUser(timeslotDto.userLogin());
-        List<Schedule> schedules = user.getGroup().getSchedulesList();
+        List<User> users = userService.getUsers(timeslotDto.users().stream().map(u -> u.userName()).collect(Collectors.toList()));
+
+        if (!User.ifUsersHaveSameGroup(users))
+        {
+            throw new TimeSlotServiceException("Users have different groups!");
+        }
 
         int lastMarketPrice = -1;
         if(timeslotDto.lastMarketPrice() != null && timeslotDto.lastMarketPrice() >= 0 ) {
             lastMarketPrice = timeslotDto.lastMarketPrice();
         }
 
-        TimeSlot ts = timeslotRepository.save(new TimeSlot(null, timeslotDto.startTime(), timeslotDto.baseSlotQuantity(), lastMarketPrice, user, schedules.get(0), null));
+        List<Schedule> schedules = users.get(0).getGroup().getSchedulesList();
+        if(schedules.isEmpty() || schedules.size() > 1) {
+            throw new TimeSlotServiceException("Group has not assigned schedule or has more than 1 schedule!");
+        }
+        Schedule schedule = schedules.get(0);
+
+        TimeSlot slotToUpdate = timeslotRepository.findByScheduleAndStartTimeAndAndBaseSlotQuantity(schedule, timeslotDto.startTime(), timeslotDto.baseSlotQuantity());
+
+        if(slotToUpdate!=null)
+            return updateTimeSlot(timeslotDto, slotToUpdate);
+
+        TimeSlot ts = timeslotRepository.save(new TimeSlot(null, timeslotDto.startTime(), timeslotDto.baseSlotQuantity(), lastMarketPrice, schedule, users, null));
         return TimeSlotService.mapToTimeSlotDto(ts);
     }
+
+    public TimeSlotDto updateTimeSlot(TimeSlotDto timeslotDto, TimeSlot timeSlotToUpdate) {
+
+        if(timeslotDto.lastMarketPrice() != null) {
+            timeSlotToUpdate.setLastMarketPrice(timeslotDto.lastMarketPrice());
+        }
+        if( timeslotDto.users() != null ) {
+            List<User> users = userService.getUsers(timeslotDto.users().stream().map( u -> u.userName()).collect(Collectors.toList()));
+            timeSlotToUpdate.setUsers(users);
+        }
+        //not implemented changing schedule for timeslot
+        timeSlotToUpdate = timeslotRepository.save(timeSlotToUpdate);
+        return mapToTimeSlotDto(timeSlotToUpdate);
+    }
+
 
     public TimeSlotDto updateTimeSlot(TimeSlotDto timeslotDto) {
         if (timeslotDto.id() == null) {
@@ -68,9 +95,9 @@ public class TimeSlotService {
         if(timeslotDto.lastMarketPrice() != null) {
             timeslot.setLastMarketPrice(timeslotDto.lastMarketPrice());
         }
-        if(timeslotDto.userLogin() != null && !timeslot.getUser().getLogin().equals(timeslotDto.userLogin())) {
-            User user = userService.getUser(timeslotDto.userLogin());
-            timeslot.setUser(user);
+        if( timeslotDto.users() != null ) {
+            List<User> users = userService.getUsers(timeslotDto.users().stream().map( u -> u.userName()).collect(Collectors.toList()));
+            timeslot.setUsers(users);
         }
         //not implemented changing schedule for timeslot
         timeslot = timeslotRepository.save(timeslot);
@@ -91,33 +118,33 @@ public class TimeSlotService {
 
 
     public static TimeSlotDto mapToTimeSlotDto(TimeSlot timeslot) {
-        return new TimeSlotDto(timeslot.getId(), timeslot.getStartTime(), timeslot.getBaseSlotQuantity(), timeslot.getLastMarketPrice(), timeslot.getUser().getLogin(), timeslot.getSchedule().getId());
+        return new TimeSlotDto(timeslot.getId(), timeslot.getStartTime(), timeslot.getBaseSlotQuantity(), timeslot.getLastMarketPrice(), timeslot.getUsers().stream().map(u -> UserService.mapToUserShortDto(u)).collect(Collectors.toList()), timeslot.getSchedule().getId());
     }
 
-    public static List<GroupedTimeSlotDto> mapToGroupedTimeSlotsDto(List<TimeSlot> timeslots)
-    {
-        timeslots.sort(Comparator.comparing(TimeSlot::getStartTime));
-        List<GroupedTimeSlotDto> grupedTimeSlotDtos =  new ArrayList<>();
-        LocalDateTime lastStartTime = timeslots.get(0).getStartTime();
-        Integer slotsQuantity = timeslots.get(0).getBaseSlotQuantity();
-        Integer marketPrice = timeslots.get(0).getLastMarketPrice();
-        long idCounter = 1;
-        List<ShortTimeSlotInfoDto> shortTimeSlotInfoDtos = new ArrayList<>();
-        for(var ts : timeslots)
-        {
-            if(!ts.getStartTime().isEqual(lastStartTime) || !ts.getBaseSlotQuantity().equals(slotsQuantity))
-            {
-                grupedTimeSlotDtos.add(new GroupedTimeSlotDto(idCounter, lastStartTime, slotsQuantity, marketPrice, shortTimeSlotInfoDtos.size(), false, shortTimeSlotInfoDtos));
-                lastStartTime = ts.getStartTime();
-                slotsQuantity = ts.getBaseSlotQuantity();
-                marketPrice = ts.getLastMarketPrice();
-                idCounter++;
-                shortTimeSlotInfoDtos = new ArrayList<>();
-            }
-            shortTimeSlotInfoDtos.add(new ShortTimeSlotInfoDto(ts.getId(), ts.getUser().getUsername(), ts.getUser().getName(), ts.getUser().getSurname()));
-        }
-        grupedTimeSlotDtos.add(new GroupedTimeSlotDto(idCounter, lastStartTime, slotsQuantity, marketPrice, shortTimeSlotInfoDtos.size(), false, shortTimeSlotInfoDtos));
-        return grupedTimeSlotDtos;
-    }
+//    public static List<GroupedTimeSlotDto> mapToGroupedTimeSlotsDto(List<TimeSlot> timeslots)
+//    {
+//        timeslots.sort(Comparator.comparing(TimeSlot::getStartTime));
+//        List<GroupedTimeSlotDto> grupedTimeSlotDtos =  new ArrayList<>();
+//        LocalDateTime lastStartTime = timeslots.get(0).getStartTime();
+//        Integer slotsQuantity = timeslots.get(0).getBaseSlotQuantity();
+//        Integer marketPrice = timeslots.get(0).getLastMarketPrice();
+//        long idCounter = 1;
+//        List<ShortTimeSlotInfoDto> shortTimeSlotInfoDtos = new ArrayList<>();
+//        for(var ts : timeslots)
+//        {
+//            if(!ts.getStartTime().isEqual(lastStartTime) || !ts.getBaseSlotQuantity().equals(slotsQuantity))
+//            {
+//                grupedTimeSlotDtos.add(new GroupedTimeSlotDto(idCounter, lastStartTime, slotsQuantity, marketPrice, shortTimeSlotInfoDtos.size(), false, shortTimeSlotInfoDtos));
+//                lastStartTime = ts.getStartTime();
+//                slotsQuantity = ts.getBaseSlotQuantity();
+//                marketPrice = ts.getLastMarketPrice();
+//                idCounter++;
+//                shortTimeSlotInfoDtos = new ArrayList<>();
+//            }
+//            shortTimeSlotInfoDtos.add(new ShortTimeSlotInfoDto(ts.getId(), ts.getUser().getUsername(), ts.getUser().getName(), ts.getUser().getSurname()));
+//        }
+//        grupedTimeSlotDtos.add(new GroupedTimeSlotDto(idCounter, lastStartTime, slotsQuantity, marketPrice, shortTimeSlotInfoDtos.size(), false, shortTimeSlotInfoDtos));
+//        return grupedTimeSlotDtos;
+//    }
 
 }

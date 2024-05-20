@@ -1,0 +1,13 @@
+PUT http://localhost:8080/timeslots
+Content-Type: application/json
+
+{
+  "id":2559,
+  "startTime": "2024-05-05T12:45:00",
+  "baseSlotQuantity": 7,
+  "users": [
+    {
+      "userName": "worker1"
+    }
+  ]
+}
