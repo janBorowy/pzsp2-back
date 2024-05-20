@@ -23,7 +23,7 @@ public class TimeSlotController {
     private final TimeSlotService timeSlotService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getTimeSlot(@PathParam("id") Long id) {
+    public ResponseEntity<?> getTimeSlot(@PathVariable("id") Long id) {
         try {
             TimeSlotDto timeslot = timeSlotService.getTimeSlot(id);
             return ResponseEntity.ok(timeslot);
