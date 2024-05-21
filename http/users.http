@@ -1,4 +1,4 @@
-POST {{url}}/auth/signup
+POST localhost:8080/auth/signup
 Content-Type: application/json
 
 {

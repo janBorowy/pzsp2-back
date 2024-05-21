@@ -2,9 +2,8 @@ package pl.pzsp2back.services;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import pl.pzsp2back.dto.GroupedTimeSlotDto;
-import pl.pzsp2back.dto.ShortTimeSlotInfoDto;
 import pl.pzsp2back.dto.TimeSlotDto;
+import pl.pzsp2back.dto.UserShortDto;
 import pl.pzsp2back.exceptions.TimeSlotServiceException;
 import pl.pzsp2back.orm.*;
 
@@ -118,7 +117,13 @@ public class TimeSlotService {
 
 
     public static TimeSlotDto mapToTimeSlotDto(TimeSlot timeslot) {
-        return new TimeSlotDto(timeslot.getId(), timeslot.getStartTime(), timeslot.getBaseSlotQuantity(), timeslot.getLastMarketPrice(), timeslot.getUsers().stream().map(u -> UserService.mapToUserShortDto(u)).collect(Collectors.toList()), timeslot.getSchedule().getId());
+        return new TimeSlotDto(timeslot.getId(), timeslot.getStartTime(), timeslot.getBaseSlotQuantity(), timeslot.getLastMarketPrice(), timeslot.getUsers().size(), null, timeslot.getUsers().stream().map(u -> UserService.mapToUserShortDto(u)).collect(Collectors.toList()), timeslot.getSchedule().getId());
+    }
+
+    public static TimeSlotDto mapToTimeSlotDto(TimeSlot timeslot, String userNameFromRequest) {
+        var shortUsersDtos = timeslot.getUsers().stream().map(u -> UserService.mapToUserShortDto(u)).collect(Collectors.toList());
+        boolean isUserSlot = shortUsersDtos.stream().anyMatch(u -> u.userName().equals(userNameFromRequest));
+        return new TimeSlotDto(timeslot.getId(), timeslot.getStartTime(), timeslot.getBaseSlotQuantity(), timeslot.getLastMarketPrice(), timeslot.getUsers().size(), isUserSlot, shortUsersDtos, timeslot.getSchedule().getId());
     }
 
 //    public static List<GroupedTimeSlotDto> mapToGroupedTimeSlotsDto(List<TimeSlot> timeslots)

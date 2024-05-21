@@ -2,8 +2,6 @@ package pl.pzsp2back;
 
 import org.junit.jupiter.api.Test;
 
-import pl.pzsp2back.dto.GroupedTimeSlotDto;
-import pl.pzsp2back.dto.ShortTimeSlotInfoDto;
 import pl.pzsp2back.orm.TimeSlot;
 import pl.pzsp2back.orm.User;
 import pl.pzsp2back.services.TimeSlotService;

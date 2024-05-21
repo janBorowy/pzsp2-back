@@ -35,7 +35,7 @@ public class AuthService implements UserDetailsService {
         String hashedPassword = new BCryptPasswordEncoder().encode(dto.password());
         var group = groupRepository.findById(dto.groupId())
                 .orElseThrow(() -> new UserServiceException("Group with given id does not exist"));
-        User newUser = new User(dto.login(), hashedPassword, false, dto.initialBalance(), dto.email(), dto.name(), dto.surname(), group, null);
+        User newUser = new User(dto.login(), hashedPassword, false, dto.initialBalance(), dto.email(), dto.name(), dto.surname(), group, null, null);
         return userRepository.save(newUser);
     }
 }

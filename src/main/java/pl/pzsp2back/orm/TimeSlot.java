@@ -34,7 +34,7 @@ public class TimeSlot {
     @JoinColumn(name = "schedule.id")
     private Schedule schedule;
 
-    @ManyToMany( fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "timeslot_user",
             joinColumns = {
                     @JoinColumn(name="timeslot_id", referencedColumnName = "id")
@@ -45,7 +45,8 @@ public class TimeSlot {
     private List<User> users;
 
 
-    @OneToMany( fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "timeslot", fetch = FetchType.LAZY)
     private List<TradeOffer> tradeOfferList = new ArrayList<>();
+
 
 }
