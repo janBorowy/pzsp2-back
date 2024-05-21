@@ -1,13 +1,13 @@
-PUT http://localhost:8080/timeslots
+PUT http://localhost:8080/timeslots/2752
 Content-Type: application/json
 
 {
-  "id":2559,
-  "startTime": "2024-05-05T12:45:00",
+  "startTime": "2024-05-06T12:45:00",
   "baseSlotQuantity": 7,
+  "lastMarketPrice": 100,
   "users": [
     {
-      "userName": "worker1"
+      "userName": "worker2"
     }
   ]
 }

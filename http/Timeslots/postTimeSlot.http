@@ -67,8 +67,14 @@ Content-Type: application/json
 
 ###
 
+##################
+### Exceptions ###
+##################
+
+
+###
 #post already existing slot with diffrent user from 1st example (run it before)
-#expected behaviour: override
+#expected behaviour: exception time slot already exist
 POST http://localhost:8080/timeslots
 Content-Type: application/json
 
@@ -83,10 +89,6 @@ Content-Type: application/json
 }
 
 ###
-
-##################
-### Exceptions ###
-##################
 
 #invalid post method because userLogin doesnt exists
 #expected behaviour: user not found exception

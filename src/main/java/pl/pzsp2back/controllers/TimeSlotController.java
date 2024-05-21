@@ -60,10 +60,10 @@ public class TimeSlotController {
         }
     }
 
-    @PutMapping
-    public ResponseEntity<?> updateTimeSlot(@Valid @RequestBody TimeSlotDto timeslotDto) {
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateTimeSlot(@RequestBody TimeSlotDto timeslotDto, @PathVariable("id") Long id) {
         try {
-            var newTimeSlotDto = timeSlotService.updateTimeSlot(timeslotDto);
+            var newTimeSlotDto = timeSlotService.updateTimeSlot(timeslotDto, id);
             return ResponseEntity.ok(newTimeSlotDto);
         } catch (TimeSlotServiceException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

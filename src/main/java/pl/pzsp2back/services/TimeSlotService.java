@@ -55,39 +55,46 @@ public class TimeSlotService {
         }
         Schedule schedule = schedules.get(0);
 
-        TimeSlot slotToUpdate = timeslotRepository.findByScheduleAndStartTimeAndAndBaseSlotQuantity(schedule, timeslotDto.startTime(), timeslotDto.baseSlotQuantity());
+        TimeSlot existingSlot = timeslotRepository.findByScheduleAndStartTimeAndAndBaseSlotQuantity(schedule, timeslotDto.startTime(), timeslotDto.baseSlotQuantity());
 
-        if(slotToUpdate!=null)
-            return updateTimeSlot(timeslotDto, slotToUpdate);
+        if(existingSlot!=null)
+            throw new TimeSlotServiceException("Timeslot already exist! You can use PUT method with given id instead. Timeslot ID: " + existingSlot.getId());
 
         TimeSlot ts = timeslotRepository.save(new TimeSlot(null, timeslotDto.startTime(), timeslotDto.baseSlotQuantity(), lastMarketPrice, schedule, users, null));
         return TimeSlotService.mapToTimeSlotDto(ts);
     }
 
-    public TimeSlotDto updateTimeSlot(TimeSlotDto timeslotDto, TimeSlot timeSlotToUpdate) {
+    public TimeSlotDto addUserToTimeSlot(TimeSlotDto timeslotDto, TimeSlot timeSlotToUpdate) {
 
-        if(timeslotDto.lastMarketPrice() != null) {
-            timeSlotToUpdate.setLastMarketPrice(timeslotDto.lastMarketPrice());
+        if(timeslotDto.lastMarketPrice() != null && !timeslotDto.lastMarketPrice().equals(timeSlotToUpdate.getLastMarketPrice())) {
+            throw new TimeSlotServiceException("Timeslot already exist, but last market price are different. Use update instead.");
         }
-        if( timeslotDto.users() != null ) {
-            List<User> users = userService.getUsers(timeslotDto.users().stream().map( u -> u.userName()).collect(Collectors.toList()));
-            timeSlotToUpdate.setUsers(users);
+        if( timeslotDto.users() == null || timeslotDto.users().isEmpty() ) {
+            throw new TimeSlotServiceException("Timeslot already exist. Cannot add users because not given.");
         }
-        //not implemented changing schedule for timeslot
+
+        List<User> usersToAdd = userService.getUsers(timeslotDto.users().stream().map( u -> u.userName()).collect(Collectors.toList()));
+        Set<User> currUsers = new HashSet<>(timeSlotToUpdate.getUsers());
+        currUsers.addAll(usersToAdd);
+
+        List<User> updatedUsers = new ArrayList<>(currUsers);
+
+        timeSlotToUpdate.setUsers(updatedUsers);
         timeSlotToUpdate = timeslotRepository.save(timeSlotToUpdate);
+
         return mapToTimeSlotDto(timeSlotToUpdate);
     }
 
-
-    public TimeSlotDto updateTimeSlot(TimeSlotDto timeslotDto) {
-        if (timeslotDto.id() == null) {
+    public TimeSlotDto updateTimeSlot(TimeSlotDto timeslotDto, Long id) {
+        if (id == null) {
             throw new TimeSlotServiceException("Id is null. It is obligatory to update timeslot.");
         }
+        var timeslot = findTimeSlotById(id);
 
-        var timeslot = findTimeSlotById(timeslotDto.id());
         if(timeslotDto.startTime() != null){
             timeslot.setStartTime(timeslotDto.startTime());
         }
+
         if(timeslotDto.baseSlotQuantity() != null) {
             timeslot.setBaseSlotQuantity(timeslotDto.baseSlotQuantity());
         }
@@ -114,6 +121,7 @@ public class TimeSlotService {
                 () -> new TimeSlotServiceException("Timeslot not found with given id: " + id)
         );
     }
+
 
 
     public static TimeSlotDto mapToTimeSlotDto(TimeSlot timeslot) {
