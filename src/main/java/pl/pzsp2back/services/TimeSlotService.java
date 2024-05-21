@@ -2,6 +2,7 @@ package pl.pzsp2back.services;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.pzsp2back.dto.TimeSlotDto;
 import pl.pzsp2back.dto.UserShortDto;
 import pl.pzsp2back.exceptions.TimeSlotServiceException;
@@ -110,6 +111,7 @@ public class TimeSlotService {
         return mapToTimeSlotDto(timeslot);
     }
 
+    @Transactional
     public TimeSlotDto deleteTimeSlot(Long id) {
         TimeSlot timeslot = findTimeSlotById(id);
         timeslotRepository.delete(timeslot);
