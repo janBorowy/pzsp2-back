@@ -3,5 +3,7 @@
 
 */node_modules
 
+/sqlscripts
+
 */package-lock.json
 build
