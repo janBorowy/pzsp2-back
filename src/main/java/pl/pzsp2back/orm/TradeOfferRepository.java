@@ -1,6 +1,9 @@
 package pl.pzsp2back.orm;
 
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.CrudRepository;
 
-public interface TradeOfferRepository extends PagingAndSortingRepository<TradeOffer, Long> {
+import java.util.List;
+
+public interface TradeOfferRepository extends CrudRepository<TradeOffer, Long> {
+
 }

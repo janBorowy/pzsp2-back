@@ -48,5 +48,4 @@ public class TimeSlot {
     @OneToMany(mappedBy = "timeslot", fetch = FetchType.LAZY)
     private List<TradeOffer> tradeOfferList = new ArrayList<>();
 
-
 }
