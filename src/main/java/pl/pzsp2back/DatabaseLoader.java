@@ -6,14 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import pl.pzsp2back.dto.SignUpDto;
+import pl.pzsp2back.dto.TimeSlotDto;
+import pl.pzsp2back.dto.UserShortDto;
 import pl.pzsp2back.exceptions.UserAlreadyExistsException;
 import pl.pzsp2back.orm.*;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
 
 import pl.pzsp2back.security.AuthService;
+import pl.pzsp2back.services.TimeSlotService;
 
 @Component
 @AllArgsConstructor
@@ -25,54 +27,79 @@ public class DatabaseLoader implements CommandLineRunner {
     private final ScheduleRepository scheduleRepository;
     private final TimeslotRepository timeslotRepository;
     private final UserRepository userRepository;
+    private final OptimizationProcessRepository optimizationProcessRepository;
+    private final TradeOfferRepository tradeOfferRepository;
+    private final TradeRepository tradeRepository;
+
+    private final TimeSlotService timeSlotService;
 
     @Override
     public void run(String... strings) throws Exception {
 
-        Group test_group = this.groupRepository.findByName("Test");
+        Group testGroup = this.groupRepository.findByName("Test");
 
-        if (test_group == null) {
-            test_group = this.groupRepository.save(new Group(null, "Test", null, null));;
+        if (testGroup == null) {
+            testGroup = this.groupRepository.save(new Group(null, "Test", null, null));;
         }
 
 
 
-        var adminDto = new SignUpDto("admin", "adminpass", "admin@admin.com", "Marek", "Racibor", test_group.getId(), 100);
-        var worker1Dto =
-                new SignUpDto("worker1", "password1", "worker@worker.com", "Adam", "Camerun", test_group.getId(), 100);
-        var worker2Dto =
-                new SignUpDto("worker2", "password2", "worker1@worker.com", "Pawel", "Mata", test_group.getId(), 300);
+        var adminDto = new SignUpDto("admin", "adminpass", "admin@admin.com", "Marek", "Racibor", testGroup.getId(), 100);
+        var worker1SignUpDto =
+                new SignUpDto("worker1", "password1", "worker@worker.com", "Adam", "Camerun", testGroup.getId(), 100);
+        var worker2SignUpDto =
+                new SignUpDto("worker2", "password2", "worker1@worker.com", "Pawel", "Mata", testGroup.getId(), 300);
 
         tryToSignUp(adminDto);
-        tryToSignUp(worker1Dto);
-        tryToSignUp(worker2Dto);
+        tryToSignUp(worker1SignUpDto);
+        tryToSignUp(worker2SignUpDto);
+
+        UserShortDto worker1Dto = new UserShortDto(worker1SignUpDto.login(), worker1SignUpDto.name(), worker1SignUpDto.surname());
+        UserShortDto worker2Dto = new UserShortDto(worker2SignUpDto.login(), worker2SignUpDto.name(), worker2SignUpDto.surname());
 
         var admin = userRepository.findById(adminDto.login()).get();
-        var worker1 = userRepository.findById(worker1Dto.login()).get();
-        var worker2 = userRepository.findById(worker2Dto.login()).get();
+        var worker1 = userRepository.findById(worker1SignUpDto.login()).get();
+        var worker2 = userRepository.findById(worker2SignUpDto.login()).get();
         admin.setIfAdmin(true);
         userRepository.save(admin);
 
-        Schedule test_schedule = this.scheduleRepository.findByTag("test");
-        if (test_schedule == null) {
+        Schedule testSchedule = this.scheduleRepository.findByTag("test");
+        if (testSchedule == null) {
             // id, baseSlotLength, name, tag, group, timeSlotList
-            test_schedule = this.scheduleRepository.save(new Schedule(null, 60, "19 week", "test", test_group, null));
-            this.timeslotRepository.save(
-                    new TimeSlot(null, LocalDateTime.of(2024, 5, 6, 10, 30), 4, 0, test_schedule, Collections.singletonList(worker1), null));
-            this.timeslotRepository.save(
-                    new TimeSlot(null, LocalDateTime.of(2024, 5, 7, 8, 30), 6, 0, test_schedule, Collections.singletonList(worker1), null));
-            this.timeslotRepository.save(
-                    new TimeSlot(null, LocalDateTime.of(2024, 5, 8, 11, 0), 2, 1000, test_schedule, Collections.singletonList(worker1), null));
-            this.timeslotRepository.save(
-                    new TimeSlot(null, LocalDateTime.of(2024, 5, 9, 9, 30), 5, 50, test_schedule, Collections.singletonList(worker1), null));
-            this.timeslotRepository.save(
-                    new TimeSlot(null, LocalDateTime.of(2024, 5, 10, 15, 30), 8, 200,test_schedule, Collections.singletonList(worker1), null));
+            testSchedule = this.scheduleRepository.save(new Schedule(null, 60, "19 week", "test", testGroup, null, null));
 
-            this.timeslotRepository.save(
-                    new TimeSlot(null, LocalDateTime.of(2024, 5, 8, 11, 0), 2, 1000, test_schedule, Collections.singletonList(worker2), null));
-            this.timeslotRepository.save(
-                    new TimeSlot(null, LocalDateTime.of(2024, 5, 9, 8, 0), 3, 20, test_schedule, Collections.singletonList(worker2), null));
+            List<UserShortDto> worker1DtoList = new ArrayList<>();
+            worker1DtoList.add(worker1Dto);
+
+            List<UserShortDto> worker2DtoList = new ArrayList<>();
+            worker2DtoList.add(worker2Dto);
+
+            List<UserShortDto> worker1worker2DtoList = new ArrayList<>();
+            worker1worker2DtoList.add(worker1Dto);
+            worker1worker2DtoList.add(worker2Dto);
+
+
+            TimeSlotDto timeslot1Dto = new TimeSlotDto(null, LocalDateTime.of(2024, 5, 6, 10, 30), 1, 0, null, null, worker1DtoList, null);
+            this.timeSlotService.createTimeSlot(timeslot1Dto);
+
+            TimeSlotDto timeslot2Dto = new TimeSlotDto(null, LocalDateTime.of(2024, 5, 7, 8, 30), 6, 0, null, null, worker1DtoList, null);
+            this.timeSlotService.createTimeSlot(timeslot2Dto);
+
+
+            TimeSlotDto timeslot3Dto = new TimeSlotDto(null, LocalDateTime.of(2024, 5, 8, 11, 0), 2, 1000, null, null, worker1worker2DtoList, null);
+            this.timeSlotService.createTimeSlot(timeslot3Dto);
+
+            TimeSlotDto timeslot4Dto = new TimeSlotDto(null, LocalDateTime.of(2024, 5, 9, 9, 30), 5, 50, null, null, worker2DtoList, null);
+            this.timeSlotService.createTimeSlot(timeslot4Dto);
+
+            TimeSlotDto timeslot5Dto = new TimeSlotDto(null, LocalDateTime.of(2024, 5, 10, 15, 30), 8, 200, null, null, worker2DtoList, null);
+            this.timeSlotService.createTimeSlot(timeslot5Dto);
+
+            TimeSlotDto timeslot6Dto = new TimeSlotDto(null, LocalDateTime.of(2024, 5, 9, 8, 0), 3, 20, null, null, worker2DtoList, null);
+            this.timeSlotService.createTimeSlot(timeslot6Dto);
+
         }
+
     }
 
     private void tryToSignUp(SignUpDto dto) {

@@ -6,10 +6,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.pzsp2back.exceptions.TradeOfferServiceException;
-import pl.pzsp2back.exceptions.UserServiceException;
-import pl.pzsp2back.orm.Trade;
 import pl.pzsp2back.orm.TradeOffer;
-import pl.pzsp2back.orm.User;
 import pl.pzsp2back.services.TradeOfferService;
 
 @RestController
@@ -20,9 +17,19 @@ public class TradeOfferController {
     private final TradeOfferService tradeOfferService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getUserTradeOffers(@PathVariable("id") Long id) {
+    public ResponseEntity<?> getTradeOffer(@PathVariable("id") Long id) {
         try {
             var offer = tradeOfferService.getTradeOffer(id);
+            return ResponseEntity.ok(offer);
+        } catch (TradeOfferServiceException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/{login}")
+    public ResponseEntity<?> getUserTradeOffers(@PathVariable("login") String login) {
+        try {
+            var offer = tradeOfferService.getTradeOffer(10L);
             return ResponseEntity.ok(offer);
         } catch (TradeOfferServiceException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

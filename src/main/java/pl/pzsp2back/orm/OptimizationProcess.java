@@ -22,10 +22,9 @@ public class OptimizationProcess {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
 
-    private LocalDateTime last_optimization_time;
-    private LocalDateTime next_optimization_time;
+    private LocalDateTime optimizationTime;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "schedule.id", nullable = false)
     private Schedule schedule;
 

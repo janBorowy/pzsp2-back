@@ -33,6 +33,7 @@ public class TimeSlotService {
     }
 
 
+    @Transactional
     public TimeSlotDto createTimeSlot(TimeSlotDto timeslotDto) {
         if (!validateTimeslotDto(timeslotDto)) {
             throw new TimeSlotServiceException("Not enough data to create timeslot");
@@ -59,7 +60,7 @@ public class TimeSlotService {
         TimeSlot existingSlot = timeslotRepository.findByScheduleAndStartTimeAndAndBaseSlotQuantity(schedule, timeslotDto.startTime(), timeslotDto.baseSlotQuantity());
 
         if(existingSlot!=null)
-            throw new TimeSlotServiceException("Timeslot already exist! You can use PUT method with given id instead. Timeslot ID: " + existingSlot.getId());
+            throw new TimeSlotServiceException("Timeslot already exist! You can use PUT method to update slot with given id instead. Timeslot ID: " + existingSlot.getId());
 
         TimeSlot ts = timeslotRepository.save(new TimeSlot(null, timeslotDto.startTime(), timeslotDto.baseSlotQuantity(), lastMarketPrice, schedule, users, null));
         return TimeSlotService.mapToTimeSlotDto(ts);

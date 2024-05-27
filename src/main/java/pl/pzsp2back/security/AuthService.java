@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.pzsp2back.dto.SignUpDto;
 import pl.pzsp2back.exceptions.UserAlreadyExistsException;
 import pl.pzsp2back.exceptions.UserServiceException;
@@ -28,6 +29,7 @@ public class AuthService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException(username));
     }
 
+    @Transactional
     public UserDetails signUp(SignUpDto dto) {
         if (userRepository.findById(dto.login()).isPresent()) {
             throw new UserAlreadyExistsException();
