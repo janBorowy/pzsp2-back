@@ -33,6 +33,6 @@ public class Schedule {
     @OneToMany(mappedBy = "schedule", fetch = FetchType.LAZY)
     private List<TimeSlot> timeSlotList = new ArrayList<>();
 
-    @OneToOne(mappedBy = "schedule", fetch = FetchType.LAZY)
-    private OptimizationProcess optimizationPorcess;
+    @OneToMany(mappedBy = "schedule", fetch = FetchType.LAZY)
+    private List<OptimizationProcess> optimizationProcesses;
 }

@@ -22,14 +22,24 @@ public class OptimizationProcess {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
 
+    @Column(nullable = false)
+    private LocalDateTime timestamp;
+
+    @Column(name = "offer_acceptance_deadline", nullable = false)
+    private LocalDateTime offerAcceptanceDeadline;
+
+    @Column(name = "optimization_time")
     private LocalDateTime optimizationTime;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "schedule.id", nullable = false)
     private Schedule schedule;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user.login", nullable = false)
-    private User owner;
+    private User processOwner;
+
+    @OneToMany(mappedBy = "optimizationProcess", fetch = FetchType.LAZY)
+    private List<TradeOffer> tradeOffersList;
 
 }

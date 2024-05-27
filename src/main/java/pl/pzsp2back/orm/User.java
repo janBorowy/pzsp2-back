@@ -56,6 +56,9 @@ public class User implements UserDetails{
             })
     private List<TimeSlot> timeSlots;
 
+    @OneToMany(mappedBy = "processOwner")
+    private List<OptimizationProcess> optimizationProcess;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();

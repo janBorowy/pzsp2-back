@@ -36,8 +36,12 @@ public class TradeOffer {
     private TimeSlot timeslot;
 
 
-    @Column(name = "if_sell_offer")
-    private Boolean ifSellOffer;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "optimizationProcess.id")
+    private OptimizationProcess optimizationProcess;
+
+    @Column(name = "if_want_offer")
+    private Boolean ifWantOffer;
 
     private Boolean isActive;
 

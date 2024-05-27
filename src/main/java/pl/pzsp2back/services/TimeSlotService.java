@@ -126,41 +126,9 @@ public class TimeSlotService {
     }
 
 
-
     public static TimeSlotDto mapToTimeSlotDto(TimeSlot timeslot) {
         return new TimeSlotDto(timeslot.getId(), timeslot.getStartTime(), timeslot.getBaseSlotQuantity(), timeslot.getLastMarketPrice(), timeslot.getUsers().size(), null, timeslot.getUsers().stream().map(u -> UserService.mapToUserShortDto(u)).collect(Collectors.toList()), timeslot.getSchedule().getId());
     }
 
-    public static TimeSlotDto mapToTimeSlotDto(TimeSlot timeslot, String userNameFromRequest) {
-        var shortUsersDtos = timeslot.getUsers().stream().map(u -> UserService.mapToUserShortDto(u)).collect(Collectors.toList());
-        boolean isUserSlot = shortUsersDtos.stream().anyMatch(u -> u.userName().equals(userNameFromRequest));
-        return new TimeSlotDto(timeslot.getId(), timeslot.getStartTime(), timeslot.getBaseSlotQuantity(), timeslot.getLastMarketPrice(), timeslot.getUsers().size(), isUserSlot, shortUsersDtos, timeslot.getSchedule().getId());
-    }
-
-//    public static List<GroupedTimeSlotDto> mapToGroupedTimeSlotsDto(List<TimeSlot> timeslots)
-//    {
-//        timeslots.sort(Comparator.comparing(TimeSlot::getStartTime));
-//        List<GroupedTimeSlotDto> grupedTimeSlotDtos =  new ArrayList<>();
-//        LocalDateTime lastStartTime = timeslots.get(0).getStartTime();
-//        Integer slotsQuantity = timeslots.get(0).getBaseSlotQuantity();
-//        Integer marketPrice = timeslots.get(0).getLastMarketPrice();
-//        long idCounter = 1;
-//        List<ShortTimeSlotInfoDto> shortTimeSlotInfoDtos = new ArrayList<>();
-//        for(var ts : timeslots)
-//        {
-//            if(!ts.getStartTime().isEqual(lastStartTime) || !ts.getBaseSlotQuantity().equals(slotsQuantity))
-//            {
-//                grupedTimeSlotDtos.add(new GroupedTimeSlotDto(idCounter, lastStartTime, slotsQuantity, marketPrice, shortTimeSlotInfoDtos.size(), false, shortTimeSlotInfoDtos));
-//                lastStartTime = ts.getStartTime();
-//                slotsQuantity = ts.getBaseSlotQuantity();
-//                marketPrice = ts.getLastMarketPrice();
-//                idCounter++;
-//                shortTimeSlotInfoDtos = new ArrayList<>();
-//            }
-//            shortTimeSlotInfoDtos.add(new ShortTimeSlotInfoDto(ts.getId(), ts.getUser().getUsername(), ts.getUser().getName(), ts.getUser().getSurname()));
-//        }
-//        grupedTimeSlotDtos.add(new GroupedTimeSlotDto(idCounter, lastStartTime, slotsQuantity, marketPrice, shortTimeSlotInfoDtos.size(), false, shortTimeSlotInfoDtos));
-//        return grupedTimeSlotDtos;
-//    }
 
 }

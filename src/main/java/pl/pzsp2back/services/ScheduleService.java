@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.pzsp2back.dto.ScheduleDto;
 import pl.pzsp2back.exceptions.ScheduleServiceException;
+import pl.pzsp2back.exceptions.TimeSlotServiceException;
 import pl.pzsp2back.orm.Schedule;
 import pl.pzsp2back.orm.ScheduleRepository;
 
@@ -55,6 +56,15 @@ public class ScheduleService {
         return new ScheduleDto(schedule.getId(), schedule.getBaseSlotLength(), schedule.getName(), schedule.getTag(), schedule.getGroup().getName(), schedule.getTimeSlotList().stream().map(ts -> TimeSlotService.mapToTimeSlotDto(ts)).collect(Collectors.toList()));
     }
 
+    public static Schedule getOneSchedule(List<Schedule> schedules) {
+        if(schedules.isEmpty()) {
+            throw new ScheduleServiceException("Group has not assigned schedule!");
+        } else if (schedules.size() >1 ) {
+            throw new ScheduleServiceException("Group has assigned more than 1 schedule!");
+        } else {
+            return schedules.get(0);
+        }
+    }
 
     private Schedule findScheduleById(Long id) {
         return scheduleRepository.findById(id).
