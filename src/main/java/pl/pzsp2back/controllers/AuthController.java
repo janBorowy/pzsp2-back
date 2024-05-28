@@ -13,12 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.pzsp2back.dto.SignInDto;
-import pl.pzsp2back.dto.SignInResponseDto;
 import pl.pzsp2back.dto.SignUpDto;
-import pl.pzsp2back.dto.TokenDto;
-import pl.pzsp2back.exceptions.AuthException;
 import pl.pzsp2back.orm.User;
 import pl.pzsp2back.orm.UserRepository;
+import pl.pzsp2back.dtoPost.SignInPostDto;
 import pl.pzsp2back.security.AuthService;
 import pl.pzsp2back.security.TokenProvider;
 
@@ -40,14 +38,15 @@ public class AuthController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<?> signIn(@RequestBody SignInDto dto) {
+    public ResponseEntity<?> signIn(@RequestBody SignInPostDto dto) {
         try {
             log.info("Signing in user %s".formatted(dto));
             var usernamePassword = new UsernamePasswordAuthenticationToken(dto.login(), dto.password());
             var authUser = authenticationManager.authenticate(usernamePassword);
-            var accessToken = tokenService.generateAccessToken((User) authUser.getPrincipal());
+            var user = (User) authUser.getPrincipal();
+            var accessToken = tokenService.generateAccessToken(user);
             log.info("Successfully signed in user %s".formatted(dto));
-            return ResponseEntity.ok(new TokenDto(accessToken, dto.login()));
+            return ResponseEntity.ok(new SignInDto(accessToken, user.getLogin(), user.getIfAdmin(), user.getBalance(), user.getName(), user.getSurname()));
         } catch (AuthenticationException e) {
             log.info("Failed authorization for user %s".formatted(dto));
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
