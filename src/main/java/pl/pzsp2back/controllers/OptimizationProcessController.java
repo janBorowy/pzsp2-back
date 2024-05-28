@@ -6,14 +6,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.pzsp2back.dto.OptimizationProcessDto;
-import pl.pzsp2back.dto.TimeSlotDto;
+import pl.pzsp2back.dtoPost.OptimizationProcessPostDto;
 import pl.pzsp2back.exceptions.OptimizationProcessServiceException;
 import pl.pzsp2back.exceptions.TradeOfferServiceException;
-import pl.pzsp2back.orm.TradeOffer;
 import pl.pzsp2back.services.OptimizationProcessService;
-import pl.pzsp2back.services.TradeOfferService;
-
-import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -53,9 +49,9 @@ public class OptimizationProcessController {
     }
 
     @PostMapping("/{login}")
-    public ResponseEntity<?> createOptimizationProcess(@Valid @RequestBody OptimizationProcessDto optimizationProcessDto, @PathVariable("login") String login) {
+    public ResponseEntity<?> createOptimizationProcess(@Valid @RequestBody OptimizationProcessPostDto optimizationProcessPostDto, @PathVariable("login") String login) {
         try {
-            OptimizationProcessDto savedOptimizationProcessDto = optimizationProcessService.createOptimizationProcess(optimizationProcessDto, login);
+            OptimizationProcessDto savedOptimizationProcessDto = optimizationProcessService.createOptimizationProcess(optimizationProcessPostDto, login);
             return ResponseEntity.ok(savedOptimizationProcessDto);
         } catch (OptimizationProcessServiceException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

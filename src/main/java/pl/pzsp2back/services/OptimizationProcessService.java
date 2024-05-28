@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pzsp2back.dto.OptimizationProcessDto;
+import pl.pzsp2back.dtoPost.OptimizationProcessPostDto;
 import pl.pzsp2back.exceptions.OptimizationProcessServiceException;
 import pl.pzsp2back.orm.OptimizationProcess;
 import pl.pzsp2back.orm.OptimizationProcessRepository;
@@ -24,16 +25,16 @@ public class OptimizationProcessService {
 
     private UserService userService;
 
-    public OptimizationProcessDto createOptimizationProcess(OptimizationProcessDto optimizationProcessDto, String login) {
-        User userOwner = userService.getUser(login);
+    public OptimizationProcessDto createOptimizationProcess(OptimizationProcessPostDto optimizationProcessPostDto, String login) {
+        User userOwner = userService.findUserByLogin(login);
 
-        OptimizationProcess optimizationProcess = new OptimizationProcess(null, LocalDateTime.now(), optimizationProcessDto.offerAcceptanceDeadline(), optimizationProcessDto.optimizationTime(), ScheduleService.getOneSchedule(userOwner.getGroup().getSchedulesList()), userOwner, null);
+        OptimizationProcess optimizationProcess = new OptimizationProcess(null, LocalDateTime.now(), optimizationProcessPostDto.offerAcceptanceDeadline(), optimizationProcessPostDto.optimizationTime(), ScheduleService.getOneSchedule(userOwner.getGroup().getSchedulesList()), userOwner, null);
 
         return mapToOptimizationProcessDto(optimizationProcessRepository.save(optimizationProcess));
     }
 
     public OptimizationProcessDto getNearestAcceptanceDeadlineOptimizationProcess(String login) {
-        User user = userService.getUser(login);
+        User user = userService.findUserByLogin(login);
         Schedule schedule =  ScheduleService.getOneSchedule(user.getGroup().getSchedulesList());
 
         List<OptimizationProcess> optimizationProcesses = optimizationProcessRepository.findOptimizationProcessByOfferAcceptanceDeadlineAfterOrderByOfferAcceptanceDeadline(LocalDateTime.now());
@@ -48,7 +49,7 @@ public class OptimizationProcessService {
 
     @Transactional
     public List<OptimizationProcessDto> getAllOptimizationProcess(String login) {
-        User user = userService.getUser(login);
+        User user = userService.findUserByLogin(login);
         List<OptimizationProcess> optimizationProcessList = ScheduleService.getOneSchedule(user.getGroup().getSchedulesList()).getOptimizationProcesses();
         List<OptimizationProcessDto> optimizationProcessDtoList = optimizationProcessList.stream().map(op -> mapToOptimizationProcessDto(op)).collect(Collectors.toList());
         return optimizationProcessDtoList;
