@@ -1,7 +1,5 @@
 package pl.pzsp2back.dto;
 
-import pl.pzsp2back.orm.User;
-
 import java.time.LocalDateTime;
 import java.util.List;
 

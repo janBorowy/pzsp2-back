@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.pzsp2back.dto.ScheduleDto;
 import pl.pzsp2back.exceptions.ScheduleServiceException;
-import pl.pzsp2back.exceptions.TimeSlotServiceException;
 import pl.pzsp2back.orm.Schedule;
 import pl.pzsp2back.orm.ScheduleRepository;
 
@@ -42,7 +41,7 @@ public class ScheduleService {
     }
 
     public List<Schedule> getGroupSchedulesByLogin(String login) throws RuntimeException {
-        var user = userService.getUser(login);
+        var user = userService.findUserByLogin(login);
         var groupSchedules = user.getGroup().getSchedulesList();
         if(groupSchedules != null)
         {

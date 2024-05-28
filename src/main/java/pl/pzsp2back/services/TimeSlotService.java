@@ -4,11 +4,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pzsp2back.dto.TimeSlotDto;
-import pl.pzsp2back.dto.UserShortDto;
 import pl.pzsp2back.exceptions.TimeSlotServiceException;
 import pl.pzsp2back.orm.*;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -39,7 +37,7 @@ public class TimeSlotService {
             throw new TimeSlotServiceException("Not enough data to create timeslot");
         }
 
-        List<User> users = userService.getUsers(timeslotDto.users().stream().map(u -> u.userName()).collect(Collectors.toList()));
+        List<User> users = userService.findUsersByLogin(timeslotDto.users().stream().map(u -> u.login()).collect(Collectors.toList()));
 
         if (!User.ifUsersHaveSameGroup(users))
         {
@@ -75,7 +73,7 @@ public class TimeSlotService {
             throw new TimeSlotServiceException("Timeslot already exist. Cannot add users because not given.");
         }
 
-        List<User> usersToAdd = userService.getUsers(timeslotDto.users().stream().map( u -> u.userName()).collect(Collectors.toList()));
+        List<User> usersToAdd = userService.findUsersByLogin(timeslotDto.users().stream().map( u -> u.login()).collect(Collectors.toList()));
         Set<User> currUsers = new HashSet<>(timeSlotToUpdate.getUsers());
         currUsers.addAll(usersToAdd);
 
@@ -104,7 +102,7 @@ public class TimeSlotService {
             timeslot.setLastMarketPrice(timeslotDto.lastMarketPrice());
         }
         if( timeslotDto.users() != null ) {
-            List<User> users = userService.getUsers(timeslotDto.users().stream().map( u -> u.userName()).collect(Collectors.toList()));
+            List<User> users = userService.findUsersByLogin(timeslotDto.users().stream().map( u -> u.login()).collect(Collectors.toList()));
             timeslot.setUsers(users);
         }
         //not implemented changing schedule for timeslot
