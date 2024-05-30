@@ -2,14 +2,12 @@ package pl.pzsp2back.controllers;
 
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.pzsp2back.dtoPost.TradeOfferPostDto;
 import pl.pzsp2back.exceptions.TradeOfferServiceException;
-import pl.pzsp2back.orm.TradeOffer;
 import pl.pzsp2back.services.TradeOfferService;
 
 @RestController
@@ -36,7 +34,7 @@ public class TradeOfferController {
     @GetMapping("/all/{login}")
     public ResponseEntity<?> getAllUserTradeOffers(@PathVariable("login") String login) {
         try {
-            var offer = tradeOfferService.getTradeOffer(10L);
+            var offer = tradeOfferService.getUserTradeOffers(login);
             return ResponseEntity.ok(offer);
         } catch (TradeOfferServiceException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -64,12 +62,12 @@ public class TradeOfferController {
 
     @Operation(summary = "Create trade offer for given user (login).",
             description = """
-                    This endpoint updates trade offer with given id.
+                    This endpoint creates trade offer for given user.
 
                     Price: can be null (default: 0)\n
                     TimeSlotId: must be given\n
                     IfWantOffer: must be given\n
-                    OptimizationProcessId: can be null (default: nearest optimization process)\n
+                    OptimizationProcessId: can be null (default: nearest optimization process - but not working yet...) \n
                     
                     return: updated offer
                     """)

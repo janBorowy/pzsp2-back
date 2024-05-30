@@ -107,7 +107,7 @@ public class OptimizationProcessService {
     }
 
 
-    private OptimizationProcess findOptimizationProcessById(Long id) {
+    public OptimizationProcess findOptimizationProcessById(Long id) {
         Optional<OptimizationProcess> optimizationProcess = optimizationProcessRepository.findById(id);
         if(!optimizationProcess.isPresent()) {
             throw new OptimizationProcessServiceException("Optimization process doesn't exist with id: " + id);

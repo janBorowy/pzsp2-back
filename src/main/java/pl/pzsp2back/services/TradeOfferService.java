@@ -1,9 +1,7 @@
 package pl.pzsp2back.services;
 
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import pl.pzsp2back.dto.OptimizationProcessDto;
 import pl.pzsp2back.dto.TradeOfferDto;
 import pl.pzsp2back.dtoPost.TradeOfferPostDto;
 import pl.pzsp2back.exceptions.TradeOfferServiceException;
@@ -36,9 +34,14 @@ public class TradeOfferService {
 
         TimeSlot timeSlot = timeSlotService.findTimeSlotById(newOffer.timeSlotId());
 
-        //TODO find optimization process for trade offer and add this to offer.
+        OptimizationProcess optimizationProcess = null;
+        if (newOffer.optimizationProcessId() != null) {
+            optimizationProcess = optimizationProcessService.findOptimizationProcessById(newOffer.optimizationProcessId());
+        }
 
-        TradeOffer tradeOffer = new TradeOffer(null, newOffer.price(), LocalDateTime.now(), user, timeSlot, null , newOffer.ifWantOffer(), null);
+        //TODO find optimization process for trade offer if not given and add this to offer.
+
+        TradeOffer tradeOffer = new TradeOffer(null, newOffer.price(), LocalDateTime.now(), user, timeSlot, optimizationProcess, newOffer.ifWantOffer(), null);
 
         return mapToTradeOfferDto(tradeOfferRepository.save(tradeOffer));
     }

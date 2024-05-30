@@ -55,7 +55,7 @@ public class OptimizationProcessController {
     }
 
 
-    @Operation(summary = "Create new optimization process, allowed only for admin type accounts [admin only]",
+    @Operation(summary = "Create new optimization process [admin only]",
             description = """
                     OfferAcceptanceDeadline: must be given and this date must be before optimization time date \n
                     OptimizationTime: can be null \n
