@@ -7,11 +7,11 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.pzsp2back.dto.OptimizationProcessDto;
 import pl.pzsp2back.dtoPost.OptimizationProcessPostDto;
 import pl.pzsp2back.exceptions.OptimizationProcessServiceException;
-import pl.pzsp2back.orm.OptimizationProcess;
-import pl.pzsp2back.orm.OptimizationProcessRepository;
-import pl.pzsp2back.orm.Schedule;
-import pl.pzsp2back.orm.User;
+import pl.pzsp2back.mapper.Mapper;
+import pl.pzsp2back.orm.*;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -74,4 +74,12 @@ public class OptimizationProcessService {
     public static OptimizationProcessDto mapToOptimizationProcessDto(OptimizationProcess optimizationProcess) {
         return new OptimizationProcessDto(optimizationProcess.getId(), optimizationProcess.getTimestamp(), optimizationProcess.getOfferAcceptanceDeadline(), optimizationProcess.getOptimizationTime(), optimizationProcess.getSchedule().getId(), UserService.mapToUserShortDto(optimizationProcess.getProcessOwner()));
     }
+    public OptimizationProcessDto RunOptimizationProcessDto(OptimizationProcess optimizationProcess) {
+
+        Mapper.mapDataFile(optimizationProcess);
+
+        return new OptimizationProcessDto(optimizationProcess.getId(), optimizationProcess.getTimestamp(), optimizationProcess.getOfferAcceptanceDeadline(), optimizationProcess.getOptimizationTime(), optimizationProcess.getSchedule().getId(), UserService.mapToUserShortDto(optimizationProcess.getProcessOwner()));
+    }
+
+
 }
