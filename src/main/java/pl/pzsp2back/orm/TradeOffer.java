@@ -21,7 +21,7 @@ public class TradeOffer {
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "integer default 0")
     private Integer price;
 
     private LocalDateTime timestamp;
@@ -43,6 +43,7 @@ public class TradeOffer {
     @Column(name = "if_want_offer")
     private Boolean ifWantOffer;
 
+    @Column(name = "is_active", columnDefinition = "boolean default true")
     private Boolean isActive;
 
 
