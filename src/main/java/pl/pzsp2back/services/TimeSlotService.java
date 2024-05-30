@@ -105,6 +105,7 @@ public class TimeSlotService {
             List<User> users = userService.findUsersByLogin(timeslotDto.users().stream().map( u -> u.login()).collect(Collectors.toList()));
             timeslot.setUsers(users);
         }
+
         //not implemented changing schedule for timeslot
         timeslot = timeslotRepository.save(timeslot);
         return mapToTimeSlotDto(timeslot);
@@ -117,7 +118,7 @@ public class TimeSlotService {
         return mapToTimeSlotDto(timeslot);
     }
 
-    private TimeSlot findTimeSlotById(Long id) {
+    public TimeSlot findTimeSlotById(Long id) {
         return timeslotRepository.findById(id).orElseThrow(
                 () -> new TimeSlotServiceException("Timeslot not found with given id: " + id)
         );
