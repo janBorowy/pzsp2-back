@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class Mapper {
 
-    public static void mapDataFile(OptimizationProcess optimizationProcess){
+    public void mapDataFile(OptimizationProcess optimizationProcess){
         List<TradeOffer> validOffers = optimizationProcess.getTradeOffersList()
                 .stream()
                 .filter(TradeOffer::getIsActive)
@@ -30,31 +30,31 @@ public class Mapper {
                 .map(TradeOffer::getId)
                 .collect(Collectors.toList());
 
-        File file_handler = Mapper.createDateFile(optimizationProcess.getProcessOwner().getGroup().getId());
+        File file_handler = createDateFile(optimizationProcess.getProcessOwner().getGroup().getId());
 
         try {
-            Mapper.writeWorkers(file_handler, usersOffers);
+            writeWorkers(file_handler, usersOffers);
         } catch (IOException e) {
             System.out.println("Error during mapping workers");
             e.printStackTrace();
         }
 
         try {
-            Mapper.writeTimeSlots(file_handler, validOffers);
+            writeTimeSlots(file_handler, validOffers);
         } catch (IOException e) {
             System.out.println("Error during mapping time slots");
             e.printStackTrace();
         }
 
         try {
-            Mapper.writeTradeOfferts(file_handler, validOffers);
+            writeTradeOfferts(file_handler, validOffers);
         } catch (IOException e) {
             System.out.println("Error during mapping trade offers");
             e.printStackTrace();
         }
 
     }
-    public static File createDateFile(Long groupId) {
+    public File createDateFile(Long groupId) {
         String filename = groupId + "_data.dat";
         File file = new File(filename);
         try {
@@ -66,7 +66,7 @@ public class Mapper {
         return file;
     }
 
-    public static void writeWorkers(File handler, List<String> logins) throws IOException {
+    public void writeWorkers(File handler, List<String> logins) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(handler));
         writer.write("Pracownicy := ");
         for (int i = 0; i < logins.size(); i++) {
@@ -79,7 +79,7 @@ public class Mapper {
         writer.close();
     }
 
-    public static void writeTimeSlots(File handler, List<TradeOffer> validOffers) throws IOException {
+    public void writeTimeSlots(File handler, List<TradeOffer> validOffers) throws IOException {
         Set<Long> uniqueTimeslotIds = validOffers.stream()
                 .map(TradeOffer::getTimeslot)
                 .map(TimeSlot::getId)
@@ -95,7 +95,7 @@ public class Mapper {
         writer.close();
     }
 
-    public static void writeTradeOfferts(File handler, List<TradeOffer> validOffers) throws IOException {
+    public void writeTradeOfferts(File handler, List<TradeOffer> validOffers) throws IOException {
     List<String> distinctOfferOwnerLogins = validOffers.stream()
             .filter(offer -> !offer.getIfWantOffer())
             .map(TradeOffer::getOfferOwner)
@@ -115,7 +115,7 @@ public class Mapper {
     writer.close();
     }
 
-    public static void writeSchedule(File handler, List<TradeOffer> validOffers) throws IOException {
+    public void writeSchedule(File handler, List<TradeOffer> validOffers) throws IOException {
 
     }
 }
