@@ -38,7 +38,7 @@ public class TradeOfferService {
         if (newOffer.optimizationProcessId() == null) {
             optimizationProcess = optimizationProcessService.getNearestAcceptanceDeadlineOptimizationProcess(login);
         } else {
-            optimizationProcess = optimizationProcessService.getOptimizationProcess(newOffer.optimizationProcessId());;
+            optimizationProcess = optimizationProcessService.getOptimizationProcess(newOffer.optimizationProcessId());
         }
 
         TradeOffer tradeOffer = new TradeOffer(null, newOffer.price(), LocalDateTime.now(), user, timeSlot, optimizationProcess, newOffer.ifWantOffer(), null);
