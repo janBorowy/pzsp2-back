@@ -43,11 +43,13 @@ public class OptimizationProcessService {
 
         List<OptimizationProcess> optimizationProcesses = optimizationProcessRepository.findOptimizationProcessByScheduleAndOfferAcceptanceDeadlineAfterOrderByOfferAcceptanceDeadline(schedule, LocalDateTime.now());
 
-        if (optimizationProcesses.isEmpty()) {
-            throw new OptimizationProcessServiceException("This schedule doesn't have assigned optimization processes");
+        OptimizationProcess nearest=null;
+
+        if (!optimizationProcesses.isEmpty()) {
+            nearest = optimizationProcesses.get(0);
         }
 
-        return optimizationProcesses.get(0);
+        return nearest;
     }
 
 

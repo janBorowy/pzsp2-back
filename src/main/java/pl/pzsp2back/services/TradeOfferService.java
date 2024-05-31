@@ -29,16 +29,22 @@ public class TradeOfferService {
     }
 
     public TradeOffer createTradeOffer(TradeOfferPostDto newOffer, String login) {
-
         User user = userService.findUserByLogin(login);
 
         TimeSlot timeSlot = timeSlotService.getTimeSlot(newOffer.timeSlotId());
 
         OptimizationProcess optimizationProcess;
+
         if (newOffer.optimizationProcessId() == null) {
             optimizationProcess = optimizationProcessService.getNearestAcceptanceDeadlineOptimizationProcess(login);
         } else {
             optimizationProcess = optimizationProcessService.getOptimizationProcess(newOffer.optimizationProcessId());
+        }
+
+        TradeOffer existingTradeOffer = tradeOfferRepository.findTradeOfferByOptimizationProcessAndOfferOwnerAndTimeslot(optimizationProcess, user, timeSlot);
+
+        if(existingTradeOffer != null) {
+            throw new TradeOfferServiceException("This trade offer already exists. Offer ID: "+existingTradeOffer.getId());
         }
 
         TradeOffer tradeOffer = new TradeOffer(null, newOffer.price(), LocalDateTime.now(), user, timeSlot, optimizationProcess, newOffer.ifWantOffer(), null);
