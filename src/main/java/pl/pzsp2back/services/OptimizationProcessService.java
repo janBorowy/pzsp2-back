@@ -41,8 +41,7 @@ public class OptimizationProcessService {
         User user = userService.findUserByLogin(login);
         Schedule schedule =  ScheduleService.getOneSchedule(user.getGroup().getSchedulesList());
 
-        //TODO
-        List<OptimizationProcess> optimizationProcesses = optimizationProcessRepository.findOptimizationProcessByOfferAcceptanceDeadlineAfterOrderByOfferAcceptanceDeadline(LocalDateTime.now());
+        List<OptimizationProcess> optimizationProcesses = optimizationProcessRepository.findOptimizationProcessByScheduleAndOfferAcceptanceDeadlineAfterOrderByOfferAcceptanceDeadline(schedule, LocalDateTime.now());
 
         if (optimizationProcesses.isEmpty()) {
             throw new OptimizationProcessServiceException("This schedule doesn't have assigned optimization processes");
