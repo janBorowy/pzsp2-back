@@ -1,9 +1,6 @@
 package pl.pzsp2back.mapper;
 
-import pl.pzsp2back.orm.OptimizationProcess;
-import pl.pzsp2back.orm.TimeSlot;
-import pl.pzsp2back.orm.TradeOffer;
-import pl.pzsp2back.orm.User;
+import pl.pzsp2back.orm.*;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -18,7 +15,7 @@ public class Mapper {
     public void mapDataFile(OptimizationProcess optimizationProcess){
         List<TradeOffer> validOffers = optimizationProcess.getTradeOffersList()
                 .stream()
-                .filter(TradeOffer::getIsActive)
+                .filter(tradeOffer -> tradeOffer.getStatus() == OfferStatus.ACTIVE)
                 .collect(Collectors.toList());
         List<String> usersOffers = optimizationProcess.getProcessOwner().getGroup()
                 .getUsersList()

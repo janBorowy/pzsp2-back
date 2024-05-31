@@ -43,8 +43,8 @@ public class TradeOffer {
     @Column(name = "if_want_offer")
     private Boolean ifWantOffer;
 
-    @Column(name = "is_active", columnDefinition = "boolean default true")
-    private Boolean isActive;
+    @Column(name = "status")
+    private OfferStatus status;
 
 
 

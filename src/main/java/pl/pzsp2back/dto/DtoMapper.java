@@ -1,6 +1,5 @@
 package pl.pzsp2back.dto;
 
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import pl.pzsp2back.orm.*;
 
@@ -8,28 +7,48 @@ import java.util.stream.Collectors;
 
 @Component
 public class DtoMapper {
-    public OptimizationProcessDto toDto(@NotNull OptimizationProcess optimizationProcess) {
-        return new OptimizationProcessDto(optimizationProcess.getId(), optimizationProcess.getTimestamp(), optimizationProcess.getOfferAcceptanceDeadline(), optimizationProcess.getOptimizationTime(), optimizationProcess.getSchedule().getId(), toShortDto(optimizationProcess.getProcessOwner()));
+    public OptimizationProcessDto toDto( OptimizationProcess optimizationProcess) {
+        if (optimizationProcess != null) {
+            return new OptimizationProcessDto(optimizationProcess.getId(), optimizationProcess.getTimestamp(), optimizationProcess.getOfferAcceptanceDeadline(), optimizationProcess.getOptimizationTime(), optimizationProcess.getSchedule().getId(), toShortDto(optimizationProcess.getProcessOwner()));
+        } else {
+            return null;
+        }
     }
 
-    public ScheduleDto toDto(@NotNull Schedule schedule) {
+    public ScheduleDto toDto( Schedule schedule) {
         return new ScheduleDto(schedule.getId(), schedule.getBaseSlotLength(), schedule.getName(), schedule.getTag(), schedule.getGroup().getName(), schedule.getTimeSlotList().stream().map(ts -> toDto(ts)).collect(Collectors.toList()));
     }
 
-    public TimeSlotDto toDto(@NotNull TimeSlot timeSlot) {
-        return new TimeSlotDto(timeSlot.getId(), timeSlot.getStartTime(), timeSlot.getBaseSlotQuantity(), timeSlot.getLastMarketPrice(), timeSlot.getUsers().size(), null, timeSlot.getUsers().stream().map(u -> toShortDto(u)).collect(Collectors.toList()), timeSlot.getSchedule().getId());
+    public TimeSlotDto toDto(TimeSlot timeSlot) {
+        if (timeSlot != null) {
+            return new TimeSlotDto(timeSlot.getId(), timeSlot.getStartTime(), timeSlot.getBaseSlotQuantity(), timeSlot.getLastMarketPrice(), timeSlot.getUsers().size(), null, timeSlot.getUsers().stream().map(u -> toShortDto(u)).collect(Collectors.toList()), timeSlot.getSchedule().getId());
+        } else {
+            return null;
+        }
     }
 
-    public TradeOfferDto toDto(@NotNull TradeOffer tradeOffer) {
-        return new TradeOfferDto(tradeOffer.getId(), tradeOffer.getPrice(), tradeOffer.getTimestamp(), toShortDto(tradeOffer.getOfferOwner()), toDto(tradeOffer.getTimeslot()), toDto(tradeOffer.getOptimizationProcess()), tradeOffer.getIfWantOffer(), tradeOffer.getIsActive());
+    public TradeOfferDto toDto( TradeOffer tradeOffer) {
+        if (tradeOffer != null) {
+            return new TradeOfferDto(tradeOffer.getId(), tradeOffer.getPrice(), tradeOffer.getTimestamp(), toShortDto(tradeOffer.getOfferOwner()), toDto(tradeOffer.getTimeslot()), toDto(tradeOffer.getOptimizationProcess()), tradeOffer.getIfWantOffer(), tradeOffer.getStatus());
+        } else {
+            return null;
+        }
     }
 
-    public UserDto toDto(@NotNull User user) {
-        return new UserDto(user.getLogin(), user.getPassword(), user.getIfAdmin(), user.getBalance(), user.getEmail(), user.getName(), user.getSurname(), user.getGroup().getId());
+    public UserDto toDto( User user) {
+        if (user != null) {
+            return new UserDto(user.getLogin(), user.getPassword(), user.getIfAdmin(), user.getBalance(), user.getEmail(), user.getName(), user.getSurname(), user.getGroup().getId());
+        } else {
+            return null;
+        }
     }
 
-    public UserShortDto toShortDto(@NotNull User user) {
-        return new UserShortDto(user.getLogin(), user.getName(), user.getSurname());
+    public UserShortDto toShortDto( User user) {
+        if (user != null) {
+            return new UserShortDto(user.getLogin(), user.getName(), user.getSurname());
+        } else {
+            return null;
+        }
     }
 
 }

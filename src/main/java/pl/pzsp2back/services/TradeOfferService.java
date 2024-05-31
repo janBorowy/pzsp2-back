@@ -47,7 +47,13 @@ public class TradeOfferService {
             throw new TradeOfferServiceException("This trade offer already exists. Offer ID: "+existingTradeOffer.getId());
         }
 
-        TradeOffer tradeOffer = new TradeOffer(null, newOffer.price(), LocalDateTime.now(), user, timeSlot, optimizationProcess, newOffer.ifWantOffer(), null);
+        Integer price = newOffer.price();
+
+        if (price == null) {
+            price = 0;
+        }
+
+        TradeOffer tradeOffer = new TradeOffer(null, price, LocalDateTime.now(), user, timeSlot, optimizationProcess, newOffer.ifWantOffer(), OfferStatus.ACTIVE);
 
         return tradeOfferRepository.save(tradeOffer);
     }
