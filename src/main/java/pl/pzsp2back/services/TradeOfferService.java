@@ -19,34 +19,34 @@ public class TradeOfferService {
     private final TimeSlotService timeSlotService;
     private final OptimizationProcessService optimizationProcessService;
 
-    public List<TradeOfferDto> getUserTradeOffers(String login) {
+    public List<TradeOffer> getUserTradeOffers(String login) {
         User user = userService.findUserByLogin(login);
-        return user.getListTradeOffers().stream().map(t -> mapToTradeOfferDto(t)).collect(Collectors.toList());
+        return user.getListTradeOffers();
     }
 
-    public TradeOfferDto getTradeOffer(Long id) {
-        return mapToTradeOfferDto(findTradeOfferById(id));
+    public TradeOffer getTradeOffer(Long id) {
+        return findTradeOfferById(id);
     }
 
-    public TradeOfferDto createTradeOffer(TradeOfferPostDto newOffer, String login) {
+    public TradeOffer createTradeOffer(TradeOfferPostDto newOffer, String login) {
 
         User user = userService.findUserByLogin(login);
 
-        TimeSlot timeSlot = timeSlotService.findTimeSlotById(newOffer.timeSlotId());
+        TimeSlot timeSlot = timeSlotService.getTimeSlot(newOffer.timeSlotId());
 
-        OptimizationProcess optimizationProcess = null;
-        if (newOffer.optimizationProcessId() != null) {
-            optimizationProcess = optimizationProcessService.findOptimizationProcessById(newOffer.optimizationProcessId());
+        OptimizationProcess optimizationProcess;
+        if (newOffer.optimizationProcessId() == null) {
+            optimizationProcess = optimizationProcessService.getNearestAcceptanceDeadlineOptimizationProcess(login);
+        } else {
+            optimizationProcess = optimizationProcessService.getOptimizationProcess(newOffer.optimizationProcessId());;
         }
-
-        //TODO find optimization process for trade offer if not given and add this to offer.
 
         TradeOffer tradeOffer = new TradeOffer(null, newOffer.price(), LocalDateTime.now(), user, timeSlot, optimizationProcess, newOffer.ifWantOffer(), null);
 
-        return mapToTradeOfferDto(tradeOfferRepository.save(tradeOffer));
+        return tradeOfferRepository.save(tradeOffer);
     }
 
-    public TradeOfferDto updateTradeOffer(TradeOfferPostDto updatedOffer, Long id) {
+    public TradeOffer updateTradeOffer(TradeOfferPostDto updatedOffer, Long id) {
         TradeOffer offer = findTradeOfferById(id);
 
         if (updatedOffer.price() != null) {
@@ -54,7 +54,7 @@ public class TradeOfferService {
         }
 
         if (updatedOffer.timeSlotId() != null) {
-            TimeSlot timeSlot = timeSlotService.findTimeSlotById(updatedOffer.timeSlotId());
+            TimeSlot timeSlot = timeSlotService.getTimeSlot(updatedOffer.timeSlotId());
             offer.setTimeslot(timeSlot);
         }
 
@@ -62,22 +62,18 @@ public class TradeOfferService {
             offer.setIfWantOffer(updatedOffer.ifWantOffer());
         }
 
-        return mapToTradeOfferDto(tradeOfferRepository.save(offer));
+        return tradeOfferRepository.save(offer);
     }
 
-    public TradeOfferDto deleteTradeOffer(Long id) {
+    public TradeOffer deleteTradeOffer(Long id) {
         var offer = findTradeOfferById(id);
         tradeOfferRepository.delete(offer);
-        return mapToTradeOfferDto(offer);
+        return offer;
     }
 
     private TradeOffer findTradeOfferById(Long id) {
         return tradeOfferRepository.findById(id)
                 .orElseThrow(() -> new TradeOfferServiceException("Trade offer not found!"));
-    }
-
-    public static TradeOfferDto mapToTradeOfferDto(TradeOffer tradeOffer) {
-        return new TradeOfferDto(tradeOffer.getId(), tradeOffer.getPrice(), tradeOffer.getTimestamp(), UserService.mapToUserShortDto(tradeOffer.getOfferOwner()), TimeSlotService.mapToTimeSlotDto(tradeOffer.getTimeslot()), OptimizationProcessService.mapToOptimizationProcessDto(tradeOffer.getOptimizationProcess()), tradeOffer.getIfWantOffer(), tradeOffer.getIsActive());
     }
 
 

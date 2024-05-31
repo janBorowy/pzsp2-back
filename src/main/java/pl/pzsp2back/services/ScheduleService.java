@@ -17,7 +17,7 @@ public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final UserService userService;
 
-    public ScheduleDto updateSchedule(ScheduleDto scheduleDto) {
+    public Schedule updateSchedule(ScheduleDto scheduleDto) {
         if(scheduleDto.id() == null) {
             throw new ScheduleServiceException("Id not given.");
         }
@@ -33,14 +33,17 @@ public class ScheduleService {
             schedule.setTag(scheduleDto.scheduleTag());
         }
         schedule = scheduleRepository.save(schedule);
-        return mapToScheduleDto(schedule);
+        return schedule;
     }
 
     public Schedule getSchedule(Long id) {
         return findScheduleById(id);
     }
+    public Schedule getGroupScheduleByLogin(String login) {
+        return getOneSchedule(getGroupSchedulesByLogin(login));
+    }
 
-    public List<Schedule> getGroupSchedulesByLogin(String login) throws RuntimeException {
+    private List<Schedule> getGroupSchedulesByLogin(String login) throws RuntimeException {
         var user = userService.findUserByLogin(login);
         var groupSchedules = user.getGroup().getSchedulesList();
         if(groupSchedules != null)
@@ -51,8 +54,9 @@ public class ScheduleService {
         }
     }
 
-    public static ScheduleDto mapToScheduleDto(Schedule schedule) {
-        return new ScheduleDto(schedule.getId(), schedule.getBaseSlotLength(), schedule.getName(), schedule.getTag(), schedule.getGroup().getName(), schedule.getTimeSlotList().stream().map(ts -> TimeSlotService.mapToTimeSlotDto(ts)).collect(Collectors.toList()));
+    private Schedule findScheduleById(Long id) {
+        return scheduleRepository.findById(id).
+                orElseThrow(() -> new ScheduleServiceException("Schedule not found"));
     }
 
     public static Schedule getOneSchedule(List<Schedule> schedules) {
@@ -63,10 +67,5 @@ public class ScheduleService {
         } else {
             return schedules.get(0);
         }
-    }
-
-    private Schedule findScheduleById(Long id) {
-        return scheduleRepository.findById(id).
-                orElseThrow(() -> new ScheduleServiceException("Schedule not found"));
     }
 }

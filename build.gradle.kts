@@ -13,6 +13,7 @@ repositories {
 val springVersion = "3.2.5"
 
 dependencies {
+    implementation("org.jetbrains:annotations:20.1.0")
     testImplementation("org.spockframework:spock-core:2.4-M4-groovy-4.0")
     implementation("org.springframework.boot:spring-boot-starter-web:${springVersion}")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa:${springVersion}")

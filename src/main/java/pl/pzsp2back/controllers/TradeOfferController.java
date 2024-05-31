@@ -6,9 +6,12 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.pzsp2back.dto.DtoMapper;
 import pl.pzsp2back.dtoPost.TradeOfferPostDto;
 import pl.pzsp2back.exceptions.TradeOfferServiceException;
 import pl.pzsp2back.services.TradeOfferService;
+
+import java.util.stream.Collectors;
 
 @RestController
 @AllArgsConstructor
@@ -16,14 +19,15 @@ import pl.pzsp2back.services.TradeOfferService;
 public class TradeOfferController {
 
     private final TradeOfferService tradeOfferService;
+    private final DtoMapper dtoMapper;
 
     @Operation(summary = "Get trade offer with given id",
             description = "This endpoint returns trade offer for given id.")
     @GetMapping("/{id}")
     public ResponseEntity<?> getTradeOffer(@PathVariable("id") Long id) {
         try {
-            var offer = tradeOfferService.getTradeOffer(id);
-            return ResponseEntity.ok(offer);
+            var offerDto = dtoMapper.toDto(tradeOfferService.getTradeOffer(id));
+            return ResponseEntity.ok(offerDto);
         } catch (TradeOfferServiceException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -34,8 +38,8 @@ public class TradeOfferController {
     @GetMapping("/all/{login}")
     public ResponseEntity<?> getAllUserTradeOffers(@PathVariable("login") String login) {
         try {
-            var offer = tradeOfferService.getUserTradeOffers(login);
-            return ResponseEntity.ok(offer);
+            var offerDtoList = tradeOfferService.getUserTradeOffers(login).stream().map(to -> dtoMapper.toDto(to)).collect(Collectors.toList());
+            return ResponseEntity.ok(offerDtoList);
         } catch (TradeOfferServiceException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -53,8 +57,8 @@ public class TradeOfferController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateTradeOffer(@Valid @RequestBody TradeOfferPostDto tradeOfferPostDto, @PathVariable("id") Long id) {
         try {
-            var updatedOffer = tradeOfferService.updateTradeOffer(tradeOfferPostDto, id);
-            return ResponseEntity.ok(updatedOffer);
+            var updatedOfferDto = dtoMapper.toDto(tradeOfferService.updateTradeOffer(tradeOfferPostDto, id));
+            return ResponseEntity.ok(updatedOfferDto);
         } catch (TradeOfferServiceException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -74,8 +78,8 @@ public class TradeOfferController {
     @PostMapping("/{login}")
     public ResponseEntity<?> createTradeOffer(@Valid @RequestBody TradeOfferPostDto tradeOfferPostDto, @PathVariable("login") String login) {
         try {
-            var updatedOffer = tradeOfferService.createTradeOffer(tradeOfferPostDto, login);
-            return ResponseEntity.ok(updatedOffer);
+            var createdOfferDto = dtoMapper.toDto(tradeOfferService.createTradeOffer(tradeOfferPostDto, login));
+            return ResponseEntity.ok(createdOfferDto);
         } catch (TradeOfferServiceException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -89,8 +93,8 @@ public class TradeOfferController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteTradeOffer(@PathVariable("id") Long id) {
         try {
-            var deletedOffer = tradeOfferService.deleteTradeOffer(id);
-            return ResponseEntity.ok(deletedOffer);
+            var deletedOfferDto = dtoMapper.toDto(tradeOfferService.deleteTradeOffer(id));
+            return ResponseEntity.ok(deletedOfferDto);
         } catch (TradeOfferServiceException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.pzsp2back.dto.DtoMapper;
 import pl.pzsp2back.dto.OptimizationProcessDto;
 import pl.pzsp2back.dto.ScheduleDto;
 import pl.pzsp2back.dtoPost.OptimizationProcessPostDto;
@@ -13,12 +14,15 @@ import pl.pzsp2back.exceptions.OptimizationProcessServiceException;
 import pl.pzsp2back.exceptions.TradeOfferServiceException;
 import pl.pzsp2back.services.OptimizationProcessService;
 
+import java.util.stream.Collectors;
+
 @RestController
 @AllArgsConstructor
 @RequestMapping("/optimizationProcess")
 public class OptimizationProcessController {
 
     private final OptimizationProcessService optimizationProcessService;
+    private final DtoMapper dtoMapper;
 
     @Operation(summary = "Get Optimization Process with given id")
     @GetMapping("/{id}")
@@ -35,7 +39,7 @@ public class OptimizationProcessController {
     @GetMapping("/nearest/{login}")
     public ResponseEntity<?> getNearestOptimizationProcess(@PathVariable("login") String login) {
         try {
-            var optimizationProcessDto = optimizationProcessService.getNearestAcceptanceDeadlineOptimizationProcess(login);
+            var optimizationProcessDto = dtoMapper.toDto(optimizationProcessService.getNearestAcceptanceDeadlineOptimizationProcess(login));
             return ResponseEntity.ok(optimizationProcessDto);
         } catch (OptimizationProcessServiceException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -47,8 +51,8 @@ public class OptimizationProcessController {
     @GetMapping("/all/{login}")
     public ResponseEntity<?> getAllOptimizationProcesses(@PathVariable("login") String login) {
         try {
-            var optimizationProcessDto = optimizationProcessService.getAllOptimizationProcess(login);
-            return ResponseEntity.ok(optimizationProcessDto);
+            var optimizationProcessDtoList = optimizationProcessService.getAllOptimizationProcess(login).stream().map(op -> dtoMapper.toDto(op)).collect(Collectors.toList());
+            return ResponseEntity.ok(optimizationProcessDtoList);
         } catch (TradeOfferServiceException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -65,7 +69,7 @@ public class OptimizationProcessController {
     @PostMapping("/{login}")
     public ResponseEntity<?> createOptimizationProcess(@Valid @RequestBody OptimizationProcessPostDto optimizationProcessPostDto, @PathVariable("login") String login) {
         try {
-            OptimizationProcessDto savedOptimizationProcessDto = optimizationProcessService.createOptimizationProcess(optimizationProcessPostDto, login);
+            OptimizationProcessDto savedOptimizationProcessDto = dtoMapper.toDto(optimizationProcessService.createOptimizationProcess(optimizationProcessPostDto, login));
             return ResponseEntity.ok(savedOptimizationProcessDto);
         } catch (OptimizationProcessServiceException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -82,7 +86,7 @@ public class OptimizationProcessController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateOptimizationProcess(@PathVariable("id") Long id, @Valid @RequestBody OptimizationProcessPostDto optimizationProcessPostDto) {
         try {
-            var updatedOptimizationProcess = optimizationProcessService.updateOptimizationProcess(id, optimizationProcessPostDto);
+            var updatedOptimizationProcess = dtoMapper.toDto(optimizationProcessService.updateOptimizationProcess(id, optimizationProcessPostDto));
             return ResponseEntity.ok(updatedOptimizationProcess);
         } catch (OptimizationProcessServiceException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -97,7 +101,7 @@ public class OptimizationProcessController {
     @GetMapping("/run/{id}")
     public ResponseEntity<?> runOptimization(@PathVariable("id") Long id) {
         try {
-            ScheduleDto optimizedScheduleDto = optimizationProcessService.runOptimizationProcess(id);
+            ScheduleDto optimizedScheduleDto = dtoMapper.toDto(optimizationProcessService.runOptimizationProcess(id));
             return ResponseEntity.ok(optimizedScheduleDto);
         } catch (OptimizationProcessServiceException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -123,8 +127,8 @@ public class OptimizationProcessController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteOptimizationProcess(@PathVariable("id") Long id) {
         try {
-            var deletedProcess = optimizationProcessService.deleteOptimizationProcess(id);
-            return ResponseEntity.ok(deletedProcess);
+            var deletedProcessDto = dtoMapper.toDto(optimizationProcessService.deleteOptimizationProcess(id));
+            return ResponseEntity.ok(deletedProcessDto);
         } catch (OptimizationProcessServiceException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
