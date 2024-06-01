@@ -6,6 +6,7 @@ import pl.pzsp2back.dto.DtoMapper;
 import pl.pzsp2back.dto.UserDto;
 import pl.pzsp2back.dto.UserShortDto;
 import pl.pzsp2back.exceptions.UserServiceException;
+import pl.pzsp2back.orm.Group;
 import pl.pzsp2back.orm.User;
 import pl.pzsp2back.orm.UserRepository;
 
@@ -52,6 +53,12 @@ public class UserService {
             throw new UserServiceException("Users not found");
         }
         return users;
+    }
+
+    public boolean ifSameGroup(User user, String secondUserLogin) {
+        List<User> usersList = user.getGroup().getUsersList();
+        return usersList.stream()
+                .anyMatch(u -> u.getLogin().equals(secondUserLogin));
     }
 
     public static UserShortDto mapToUserShortDto(User user) {
