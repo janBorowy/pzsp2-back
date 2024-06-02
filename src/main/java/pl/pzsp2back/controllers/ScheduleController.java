@@ -36,7 +36,7 @@ public class ScheduleController {
             if (requesterUser.getIfAdmin() && userService.ifSameGroup(requesterUser.getLogin(), login)) {
                 scheduleDto = dtoMapper.toDto(schedule);
                 return ResponseEntity.ok(scheduleDto);
-            } else if (!requesterUser.getIfAdmin()) {
+            } else if (requesterUser.getLogin().equals(login)) {
                 scheduleDto = dtoMapper.toDto(schedule, requesterUser);
                 return ResponseEntity.ok(scheduleDto);
             }
