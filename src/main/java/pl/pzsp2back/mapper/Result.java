@@ -4,8 +4,8 @@ import java.util.Map;
 
 public class Result {
     private Map<Long, Integer> timeSlotsPrices; // timeSlotID, new Price
-    private Map<String, Long> vDown; // User login, timeslotID - zmienil stan na 'wolne'
-    private Map<String, Long> vUp; // User login, timeslotID - zmienil stan na 'praca'
+    private Map<String, Long> vDown; // Offer owner login, timeslotID - zmienil stan na 'wolne'
+    private Map<String, Long> vUp; // Offer owner login, timeslotID - zmienil stan na 'praca'
 
     public Result(Map<Long, Integer> timeSlotsPrices, Map<String, Long> vDown, Map<String, Long> vUp) {
         this.timeSlotsPrices = timeSlotsPrices;
