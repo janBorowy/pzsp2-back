@@ -28,11 +28,10 @@ public class UserService {
         return findUsersByLogin(logins);
     }
 
-    public User updateUser(String login, User newUser) {
+    public User updateUser(String login, UserDto newUser) {
         var user = findUserByLogin(login);
-        newUser.setHashedPassword(user.getHashedPassword());
-        userRepository.save(newUser);
-        return newUser;
+        user.setHashedPassword(newUser.password());
+        return userRepository.save(user);
     }
 
     public User deleteUser(String login) {
@@ -55,10 +54,14 @@ public class UserService {
         return users;
     }
 
-    public boolean ifSameGroup(User user, String secondUserLogin) {
-        List<User> usersList = user.getGroup().getUsersList();
-        return usersList.stream()
-                .anyMatch(u -> u.getLogin().equals(secondUserLogin));
+    public boolean ifSameGroup(String login1, String login2) {
+        User user1 = getUser(login1);
+        List<User> usersList = user1.getGroup().getUsersList();
+        for(User u : usersList) {
+            if (u.getLogin().equals(login2))
+                return true;
+        }
+        return false;
     }
 
     public static UserShortDto mapToUserShortDto(User user) {
