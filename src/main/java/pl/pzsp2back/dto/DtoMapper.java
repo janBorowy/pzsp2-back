@@ -3,6 +3,7 @@ package pl.pzsp2back.dto;
 import org.springframework.stereotype.Component;
 import pl.pzsp2back.orm.*;
 
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 @Component
@@ -19,9 +20,21 @@ public class DtoMapper {
         return new ScheduleDto(schedule.getId(), schedule.getBaseSlotLength(), schedule.getName(), schedule.getTag(), schedule.getGroup().getName(), schedule.getTimeSlotList().stream().map(ts -> toDto(ts)).collect(Collectors.toList()));
     }
 
+    public ScheduleDto toDto( Schedule schedule, User user) {
+        return new ScheduleDto(schedule.getId(), schedule.getBaseSlotLength(), schedule.getName(), schedule.getTag(), schedule.getGroup().getName(), schedule.getTimeSlotList().stream().map(ts -> toDto(ts, user)).collect(Collectors.toList()));
+    }
+
     public TimeSlotDto toDto(TimeSlot timeSlot) {
         if (timeSlot != null) {
             return new TimeSlotDto(timeSlot.getId(), timeSlot.getStartTime(), timeSlot.getBaseSlotQuantity(), timeSlot.getLastMarketPrice(), timeSlot.getUsers().size(), null, timeSlot.getUsers().stream().map(u -> toShortDto(u)).collect(Collectors.toList()), timeSlot.getSchedule().getId());
+        } else {
+            return null;
+        }
+    }
+
+    public TimeSlotDto toDto(TimeSlot timeSlot, User user) {
+        if (timeSlot != null) {
+            return new TimeSlotDto(timeSlot.getId(), timeSlot.getStartTime(), timeSlot.getBaseSlotQuantity(), timeSlot.getLastMarketPrice(), timeSlot.getUsers().size(), timeSlot.getUsers().stream().anyMatch(u -> u.getLogin().equals(user.getLogin())), new ArrayList<>(), timeSlot.getSchedule().getId());
         } else {
             return null;
         }

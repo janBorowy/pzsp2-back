@@ -1,1 +1,6 @@
-GET http://localhost:8080/schedules/admin
+GET http://localhost:8080/schedules/worker1
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ3b3JrZXIxIiwibG9naW4iOiJ3b3JrZXIxIiwiZXhwIjoxNzE3MzMwMzc2fQ.JzQMqFWKr8xAowNOlIWF9-u3WgkiYbR3JAL4Rp_iEAo
+
+{
+}
