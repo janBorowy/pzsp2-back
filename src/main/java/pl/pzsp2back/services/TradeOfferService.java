@@ -1,33 +1,80 @@
 package pl.pzsp2back.services;
 
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import pl.pzsp2back.dto.TradeOfferDto;
+import pl.pzsp2back.dtoPost.TradeOfferPostDto;
 import pl.pzsp2back.exceptions.TradeOfferServiceException;
-import pl.pzsp2back.orm.TradeOffer;
-import pl.pzsp2back.orm.TradeOfferRepository;
+import pl.pzsp2back.orm.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
 public class TradeOfferService {
     private final TradeOfferRepository tradeOfferRepository;
+    private final UserService userService;
+    private final TimeSlotService timeSlotService;
+    private final OptimizationProcessService optimizationProcessService;
 
-    //TODO
     public List<TradeOffer> getUserTradeOffers(String login) {
-        return null;
+        User user = userService.findUserByLogin(login);
+        return user.getListTradeOffers();
     }
 
     public TradeOffer getTradeOffer(Long id) {
         return findTradeOfferById(id);
     }
 
-    public TradeOffer updateTradeOffer(TradeOffer newOffer, Long id) {
-        var offer = findTradeOfferById(id);
-        //TODO write newOffer to offer and save
-        offer = tradeOfferRepository.save(offer);
-        return offer;
+    public TradeOffer createTradeOffer(TradeOfferPostDto newOffer, String login) {
+        User user = userService.findUserByLogin(login);
+
+        TimeSlot timeSlot = timeSlotService.getTimeSlot(newOffer.timeSlotId());
+
+        OptimizationProcess optimizationProcess;
+
+        if (newOffer.optimizationProcessId() == null) {
+            optimizationProcess = optimizationProcessService.getNearestAcceptanceDeadlineOptimizationProcess(login);
+        } else {
+            optimizationProcess = optimizationProcessService.getOptimizationProcess(newOffer.optimizationProcessId());
+        }
+
+        TradeOffer existingTradeOffer = tradeOfferRepository.findTradeOfferByOptimizationProcessAndOfferOwnerAndTimeslot(optimizationProcess, user, timeSlot);
+
+        if(existingTradeOffer != null) {
+            throw new TradeOfferServiceException("This trade offer already exists. Offer ID: "+existingTradeOffer.getId());
+        }
+
+        Integer price = newOffer.price();
+
+        if (price == null) {
+            price = 0;
+        }
+
+        TradeOffer tradeOffer = new TradeOffer(null, price, LocalDateTime.now(), user, timeSlot, optimizationProcess, newOffer.ifWantOffer(), OfferStatus.ACTIVE);
+
+        return tradeOfferRepository.save(tradeOffer);
+    }
+
+    public TradeOffer updateTradeOffer(TradeOfferPostDto updatedOffer, Long id) {
+        TradeOffer offer = findTradeOfferById(id);
+
+        if (updatedOffer.price() != null) {
+            offer.setPrice(updatedOffer.price());
+        }
+
+        if (updatedOffer.timeSlotId() != null) {
+            TimeSlot timeSlot = timeSlotService.getTimeSlot(updatedOffer.timeSlotId());
+            offer.setTimeslot(timeSlot);
+        }
+
+        if (updatedOffer.ifWantOffer() != null) {
+            offer.setIfWantOffer(updatedOffer.ifWantOffer());
+        }
+
+        return tradeOfferRepository.save(offer);
     }
 
     public TradeOffer deleteTradeOffer(Long id) {
@@ -37,11 +84,6 @@ public class TradeOfferService {
     }
 
     private TradeOffer findTradeOfferById(Long id) {
-        return tradeOfferRepository.findById(id)
-                .orElseThrow(() -> new TradeOfferServiceException("Trade offer not found!"));
-    }
-
-    private TradeOffer findTradeOfferByLogin(Long id) {
         return tradeOfferRepository.findById(id)
                 .orElseThrow(() -> new TradeOfferServiceException("Trade offer not found!"));
     }

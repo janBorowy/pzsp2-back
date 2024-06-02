@@ -6,6 +6,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface OptimizationProcessRepository extends CrudRepository<OptimizationProcess, Long> {
-    List<OptimizationProcess> findOptimizationProcessByOfferAcceptanceDeadlineAfterOrderByOfferAcceptanceDeadline(LocalDateTime optimizationTime);
+    List<OptimizationProcess> findOptimizationProcessByScheduleAndOfferAcceptanceDeadlineAfterOrderByOfferAcceptanceDeadline(Schedule schedule, LocalDateTime optimizationTime);
 
 }

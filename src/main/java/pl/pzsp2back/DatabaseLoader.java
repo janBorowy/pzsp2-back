@@ -42,7 +42,6 @@ public class DatabaseLoader implements CommandLineRunner {
         }
 
 
-
         var adminDto = new SignUpDto("admin", "adminpass", "admin@admin.com", "Marek", "Racibor", testGroup.getId(), 100);
         var worker1SignUpDto =
                 new SignUpDto("worker1", "password1", "worker@worker.com", "Adam", "Camerun", testGroup.getId(), 100);

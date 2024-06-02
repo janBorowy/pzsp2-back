@@ -4,18 +4,14 @@ package pl.pzsp2back.services;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.pzsp2back.dto.OptimizationProcessDto;
 import pl.pzsp2back.dtoPost.OptimizationProcessPostDto;
 import pl.pzsp2back.exceptions.OptimizationProcessServiceException;
 import pl.pzsp2back.mapper.Mapper;
 import pl.pzsp2back.orm.*;
 
-import java.io.File;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -25,41 +21,88 @@ public class OptimizationProcessService {
 
     private UserService userService;
 
-    public OptimizationProcessDto createOptimizationProcess(OptimizationProcessPostDto optimizationProcessPostDto, String login) {
+
+    public OptimizationProcess createOptimizationProcess(OptimizationProcessPostDto optimizationProcessPostDto, String login) {
         User userOwner = userService.findUserByLogin(login);
+
+        if (optimizationProcessPostDto.optimizationTime() != null) {
+            if (optimizationProcessPostDto.optimizationTime().isBefore(optimizationProcessPostDto.offerAcceptanceDeadline())) {
+                throw new OptimizationProcessServiceException("Optimization time is before offer acceptance deadline!");
+            }
+        }
 
         OptimizationProcess optimizationProcess = new OptimizationProcess(null, LocalDateTime.now(), optimizationProcessPostDto.offerAcceptanceDeadline(), optimizationProcessPostDto.optimizationTime(), ScheduleService.getOneSchedule(userOwner.getGroup().getSchedulesList()), userOwner, null);
 
-        return mapToOptimizationProcessDto(optimizationProcessRepository.save(optimizationProcess));
+        return optimizationProcessRepository.save(optimizationProcess);
     }
 
-    public OptimizationProcessDto getNearestAcceptanceDeadlineOptimizationProcess(String login) {
+
+    public OptimizationProcess getNearestAcceptanceDeadlineOptimizationProcess(String login) {
         User user = userService.findUserByLogin(login);
         Schedule schedule =  ScheduleService.getOneSchedule(user.getGroup().getSchedulesList());
 
-        List<OptimizationProcess> optimizationProcesses = optimizationProcessRepository.findOptimizationProcessByOfferAcceptanceDeadlineAfterOrderByOfferAcceptanceDeadline(LocalDateTime.now());
+        List<OptimizationProcess> optimizationProcesses = optimizationProcessRepository.findOptimizationProcessByScheduleAndOfferAcceptanceDeadlineAfterOrderByOfferAcceptanceDeadline(schedule, LocalDateTime.now());
 
-        if (optimizationProcesses.isEmpty()) {
-            throw new OptimizationProcessServiceException("This schedule doesn't have assigned optimization processes");
+        OptimizationProcess nearest=null;
+
+        if (!optimizationProcesses.isEmpty()) {
+            nearest = optimizationProcesses.get(0);
         }
 
-        return mapToOptimizationProcessDto(optimizationProcesses.get(0));
-
+        return nearest;
     }
+
 
     @Transactional
-    public List<OptimizationProcessDto> getAllOptimizationProcess(String login) {
+    public List<OptimizationProcess> getAllOptimizationProcess(String login) {
         User user = userService.findUserByLogin(login);
         List<OptimizationProcess> optimizationProcessList = ScheduleService.getOneSchedule(user.getGroup().getSchedulesList()).getOptimizationProcesses();
-        List<OptimizationProcessDto> optimizationProcessDtoList = optimizationProcessList.stream().map(op -> mapToOptimizationProcessDto(op)).collect(Collectors.toList());
-        return optimizationProcessDtoList;
+        return optimizationProcessList;
     }
 
 
-
-    public OptimizationProcessDto getOptimizationProcess(Long id) {
-        return mapToOptimizationProcessDto(findOptimizationProcessById(id));
+    public OptimizationProcess getOptimizationProcess(Long id) {
+        return findOptimizationProcessById(id);
     }
+
+
+    public OptimizationProcess updateOptimizationProcess(Long id, OptimizationProcessPostDto optimizationProcessPostDto) {
+
+        OptimizationProcess optimizationProcess = findOptimizationProcessById(id);
+
+        if (optimizationProcessPostDto.offerAcceptanceDeadline() != null) {
+            optimizationProcess.setOfferAcceptanceDeadline(optimizationProcessPostDto.offerAcceptanceDeadline());
+        }
+
+        if (optimizationProcessPostDto.optimizationTime() != null) {
+            if (optimizationProcessPostDto.optimizationTime().isBefore(optimizationProcess.getOfferAcceptanceDeadline())) {
+                throw new OptimizationProcessServiceException("Optimization time is before offer acceptance deadline!");
+            }
+            optimizationProcess.setOptimizationTime(optimizationProcessPostDto.optimizationTime());
+        }
+
+        return optimizationProcessRepository.save(optimizationProcess);
+    }
+
+    public OptimizationProcess deleteOptimizationProcess(Long id) {
+
+        OptimizationProcess optimizationProcess = findOptimizationProcessById(id);
+
+        optimizationProcessRepository.delete(optimizationProcess);
+
+        return optimizationProcess;
+    }
+
+    public Schedule runOptimizationProcess(Long id) {
+        OptimizationProcess optimizationProcess = findOptimizationProcessById(id);
+
+        Mapper mapper = new Mapper();
+
+        //TODO write logic which will be responsible for running ampl model and (temporary) saving data
+
+        return ScheduleService.getOneSchedule(optimizationProcess.getProcessOwner().getGroup().getSchedulesList());
+    }
+
 
     private OptimizationProcess findOptimizationProcessById(Long id) {
         Optional<OptimizationProcess> optimizationProcess = optimizationProcessRepository.findById(id);
@@ -68,17 +111,6 @@ public class OptimizationProcessService {
         } else {
             return optimizationProcess.get();
         }
-    }
-
-
-    public static OptimizationProcessDto mapToOptimizationProcessDto(OptimizationProcess optimizationProcess) {
-        return new OptimizationProcessDto(optimizationProcess.getId(), optimizationProcess.getTimestamp(), optimizationProcess.getOfferAcceptanceDeadline(), optimizationProcess.getOptimizationTime(), optimizationProcess.getSchedule().getId(), UserService.mapToUserShortDto(optimizationProcess.getProcessOwner()));
-    }
-    public OptimizationProcessDto RunOptimizationProcessDto(OptimizationProcess optimizationProcess) {
-
-        Mapper.mapDataFile(optimizationProcess);
-
-        return new OptimizationProcessDto(optimizationProcess.getId(), optimizationProcess.getTimestamp(), optimizationProcess.getOfferAcceptanceDeadline(), optimizationProcess.getOptimizationTime(), optimizationProcess.getSchedule().getId(), UserService.mapToUserShortDto(optimizationProcess.getProcessOwner()));
     }
 
 

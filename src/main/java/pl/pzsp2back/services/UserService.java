@@ -2,9 +2,11 @@ package pl.pzsp2back.services;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import pl.pzsp2back.dto.DtoMapper;
 import pl.pzsp2back.dto.UserDto;
 import pl.pzsp2back.dto.UserShortDto;
 import pl.pzsp2back.exceptions.UserServiceException;
+import pl.pzsp2back.orm.Group;
 import pl.pzsp2back.orm.User;
 import pl.pzsp2back.orm.UserRepository;
 
@@ -18,25 +20,24 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public UserDto getUser(String login) {
-        return mapToUserDto(findUserByLogin(login));
+    public User getUser(String login) {
+        return findUserByLogin(login);
     }
 
-    public List<UserDto> getUsers(List<String> logins) {
-        return findUsersByLogin(logins).stream().map(u -> mapToUserDto(u)).collect(Collectors.toList());
+    public List<User> getUsers(List<String> logins) {
+        return findUsersByLogin(logins);
     }
 
-    public UserDto updateUser(String login, User newUser) {
+    public User updateUser(String login, UserDto newUser) {
         var user = findUserByLogin(login);
-        newUser.setHashedPassword(user.getHashedPassword());
-        userRepository.save(newUser);
-        return mapToUserDto(newUser);
+        user.setHashedPassword(newUser.password());
+        return userRepository.save(user);
     }
 
-    public UserDto deleteUser(String login) {
+    public User deleteUser(String login) {
         var user = findUserByLogin(login);
         userRepository.delete(user);
-        return mapToUserDto(user);
+        return user;
     }
 
     public User findUserByLogin(String login) {
@@ -53,13 +54,20 @@ public class UserService {
         return users;
     }
 
+    public boolean ifSameGroup(String login1, String login2) {
+        User user1 = getUser(login1);
+        List<User> usersList = user1.getGroup().getUsersList();
+        for(User u : usersList) {
+            if (u.getLogin().equals(login2))
+                return true;
+        }
+        return false;
+    }
+
     public static UserShortDto mapToUserShortDto(User user) {
         return new UserShortDto(user.getLogin(), user.getName(), user.getSurname());
     }
 
-    public static UserDto mapToUserDto(User user) {
-        return new UserDto(user.getLogin(), user.getPassword(), user.getIfAdmin(), user.getBalance(), user.getEmail(), user.getName(), user.getSurname(), user.getGroup().getId());
-    }
 
 
 }

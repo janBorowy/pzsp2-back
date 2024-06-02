@@ -19,7 +19,7 @@ public class Mapper {
     public void mapDataFile(OptimizationProcess optimizationProcess){
         List<TradeOffer> validOffers = optimizationProcess.getTradeOffersList()
                 .stream()
-                .filter(TradeOffer::getIsActive)
+                .filter(tradeOffer -> tradeOffer.getStatus() == OfferStatus.ACTIVE)
                 .collect(Collectors.toList());
         List<String> allLoginsSorted = optimizationProcess.getProcessOwner().getGroup()
                 .getUsersList()

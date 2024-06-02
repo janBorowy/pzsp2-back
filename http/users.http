@@ -22,9 +22,19 @@ Content-Type: application/json
 
 ###
 
-GET {{url}}/users/worker1
+POST localhost:8080/auth/signin
+Content-Type: application/json
+
+{
+  "login": "worker1",
+  "password": "password1"
+}
+
+###
+
+GET localhost:8080/users/admin
 Accept: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImxvZ2luIjoiYWRtaW4iLCJleHAiOjE3MTYxNzE4Mjl9.Lcgrdd3rcQJMrja7_6tYkQwQgSnCqyNDJIyy7NOc0-k
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImxvZ2luIjoiYWRtaW4iLCJleHAiOjE3MTczMjk5ODd9.uxLS4kw5M-OM1Q_M80KtywCyUHjPsUChohx3AZu_Iww
 
 {
 }

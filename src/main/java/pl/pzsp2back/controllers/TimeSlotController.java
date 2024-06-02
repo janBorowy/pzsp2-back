@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.pzsp2back.dto.DtoMapper;
 import pl.pzsp2back.dto.TimeSlotDto;
 import pl.pzsp2back.exceptions.TimeSlotServiceException;
 import pl.pzsp2back.exceptions.UserServiceException;
@@ -20,11 +21,12 @@ import java.util.List;
 public class TimeSlotController {
 
     private final TimeSlotService timeSlotService;
+    private final DtoMapper dtoMapper;
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getTimeSlot(@PathVariable("id") Long id) {
         try {
-            TimeSlotDto timeslot = timeSlotService.getTimeSlot(id);
+            TimeSlotDto timeslot = dtoMapper.toDto(timeSlotService.getTimeSlot(id));
             return ResponseEntity.ok(timeslot);
         } catch (TimeSlotServiceException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -34,7 +36,7 @@ public class TimeSlotController {
     @PostMapping
     public ResponseEntity<?> createTimeSlot(@Valid @RequestBody TimeSlotDto timeslotDto) {
         try {
-            var newTimeSlotDto = timeSlotService.createTimeSlot(timeslotDto);
+            var newTimeSlotDto = dtoMapper.toDto(timeSlotService.createTimeSlot(timeslotDto));
             return new ResponseEntity<>(newTimeSlotDto, HttpStatus.CREATED);
         } catch (TimeSlotServiceException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -49,7 +51,7 @@ public class TimeSlotController {
             List<TimeSlotDto> newTimeSlotDtos = new ArrayList<>();
             for(var ts : timeSlotDtos)
             {
-                newTimeSlotDtos.add(timeSlotService.createTimeSlot(ts));
+                newTimeSlotDtos.add(dtoMapper.toDto(timeSlotService.createTimeSlot(ts)));
             }
             return new ResponseEntity<>(newTimeSlotDtos, HttpStatus.CREATED);
         } catch (TimeSlotServiceException e) {
@@ -62,7 +64,7 @@ public class TimeSlotController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateTimeSlot(@RequestBody TimeSlotDto timeslotDto, @PathVariable("id") Long id) {
         try {
-            var newTimeSlotDto = timeSlotService.updateTimeSlot(timeslotDto, id);
+            var newTimeSlotDto = dtoMapper.toDto(timeSlotService.updateTimeSlot(timeslotDto, id));
             return ResponseEntity.ok(newTimeSlotDto);
         } catch (TimeSlotServiceException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -74,7 +76,7 @@ public class TimeSlotController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteTimeSlot(@PathVariable("id") Long id) {
         try {
-            var deletedTimeSlot = timeSlotService.deleteTimeSlot(id);
+            var deletedTimeSlot = dtoMapper.toDto(timeSlotService.deleteTimeSlot(id));
             return ResponseEntity.ok(deletedTimeSlot);
         } catch (TimeSlotServiceException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

@@ -25,14 +25,14 @@ public class TimeSlotService {
     }
 
 
-    public TimeSlotDto getTimeSlot(Long id) {
+    public TimeSlot getTimeSlot(Long id) {
         TimeSlot timeslot = findTimeSlotById(id);
-        return mapToTimeSlotDto(timeslot);
+        return timeslot;
     }
 
 
     @Transactional
-    public TimeSlotDto createTimeSlot(TimeSlotDto timeslotDto) {
+    public TimeSlot createTimeSlot(TimeSlotDto timeslotDto) {
         if (!validateTimeslotDto(timeslotDto)) {
             throw new TimeSlotServiceException("Not enough data to create timeslot");
         }
@@ -60,11 +60,10 @@ public class TimeSlotService {
         if(existingSlot!=null)
             throw new TimeSlotServiceException("Timeslot already exist! You can use PUT method to update slot with given id instead. Timeslot ID: " + existingSlot.getId());
 
-        TimeSlot ts = timeslotRepository.save(new TimeSlot(null, timeslotDto.startTime(), timeslotDto.baseSlotQuantity(), lastMarketPrice, schedule, users, null));
-        return TimeSlotService.mapToTimeSlotDto(ts);
+        return timeslotRepository.save(new TimeSlot(null, timeslotDto.startTime(), timeslotDto.baseSlotQuantity(), lastMarketPrice, schedule, users, null));
     }
 
-    public TimeSlotDto addUserToTimeSlot(TimeSlotDto timeslotDto, TimeSlot timeSlotToUpdate) {
+    public TimeSlot addUserToTimeSlot(TimeSlotDto timeslotDto, TimeSlot timeSlotToUpdate) {
 
         if(timeslotDto.lastMarketPrice() != null && !timeslotDto.lastMarketPrice().equals(timeSlotToUpdate.getLastMarketPrice())) {
             throw new TimeSlotServiceException("Timeslot already exist, but last market price are different. Use update instead.");
@@ -80,12 +79,10 @@ public class TimeSlotService {
         List<User> updatedUsers = new ArrayList<>(currUsers);
 
         timeSlotToUpdate.setUsers(updatedUsers);
-        timeSlotToUpdate = timeslotRepository.save(timeSlotToUpdate);
-
-        return mapToTimeSlotDto(timeSlotToUpdate);
+        return timeslotRepository.save(timeSlotToUpdate);
     }
 
-    public TimeSlotDto updateTimeSlot(TimeSlotDto timeslotDto, Long id) {
+    public TimeSlot updateTimeSlot(TimeSlotDto timeslotDto, Long id) {
         if (id == null) {
             throw new TimeSlotServiceException("Id is null. It is obligatory to update timeslot.");
         }
@@ -105,16 +102,16 @@ public class TimeSlotService {
             List<User> users = userService.findUsersByLogin(timeslotDto.users().stream().map( u -> u.login()).collect(Collectors.toList()));
             timeslot.setUsers(users);
         }
+
         //not implemented changing schedule for timeslot
-        timeslot = timeslotRepository.save(timeslot);
-        return mapToTimeSlotDto(timeslot);
+        return timeslotRepository.save(timeslot);
     }
 
     @Transactional
-    public TimeSlotDto deleteTimeSlot(Long id) {
+    public TimeSlot deleteTimeSlot(Long id) {
         TimeSlot timeslot = findTimeSlotById(id);
         timeslotRepository.delete(timeslot);
-        return mapToTimeSlotDto(timeslot);
+        return timeslot;
     }
 
     private TimeSlot findTimeSlotById(Long id) {
@@ -124,9 +121,6 @@ public class TimeSlotService {
     }
 
 
-    public static TimeSlotDto mapToTimeSlotDto(TimeSlot timeslot) {
-        return new TimeSlotDto(timeslot.getId(), timeslot.getStartTime(), timeslot.getBaseSlotQuantity(), timeslot.getLastMarketPrice(), timeslot.getUsers().size(), null, timeslot.getUsers().stream().map(u -> UserService.mapToUserShortDto(u)).collect(Collectors.toList()), timeslot.getSchedule().getId());
-    }
 
 
 }
