@@ -6,15 +6,21 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import pl.pzsp2back.dto.SignUpDto;
 import pl.pzsp2back.dto.TimeSlotDto;
+import pl.pzsp2back.dto.TradeOfferDto;
 import pl.pzsp2back.dto.UserShortDto;
+import pl.pzsp2back.dtoPost.OptimizationProcessPostDto;
+import pl.pzsp2back.dtoPost.TradeOfferPostDto;
 import pl.pzsp2back.exceptions.UserAlreadyExistsException;
 import pl.pzsp2back.orm.*;
 
+import java.sql.Time;
 import java.time.LocalDateTime;
 import java.util.*;
 
 import pl.pzsp2back.security.AuthService;
+import pl.pzsp2back.services.OptimizationProcessService;
 import pl.pzsp2back.services.TimeSlotService;
+import pl.pzsp2back.services.TradeOfferService;
 
 @Component
 @AllArgsConstructor
@@ -31,6 +37,8 @@ public class DatabaseLoader implements CommandLineRunner {
     private final TradeRepository tradeRepository;
 
     private final TimeSlotService timeSlotService;
+    private final TradeOfferService tradeOfferService;
+    private final OptimizationProcessService optimizationProcessService;
 
     @Override
     public void run(String... strings) throws Exception {
@@ -78,7 +86,7 @@ public class DatabaseLoader implements CommandLineRunner {
 
 
             TimeSlotDto timeslot1Dto = new TimeSlotDto(null, LocalDateTime.of(2024, 5, 6, 10, 30), 1, 0, null, null, worker1DtoList, null);
-            this.timeSlotService.createTimeSlot(timeslot1Dto);
+            TimeSlot ts1 = timeSlotService.createTimeSlot(timeslot1Dto);
 
             TimeSlotDto timeslot2Dto = new TimeSlotDto(null, LocalDateTime.of(2024, 5, 7, 8, 30), 6, 0, null, null, worker1DtoList, null);
             this.timeSlotService.createTimeSlot(timeslot2Dto);
@@ -95,6 +103,16 @@ public class DatabaseLoader implements CommandLineRunner {
 
             TimeSlotDto timeslot6Dto = new TimeSlotDto(null, LocalDateTime.of(2024, 5, 9, 8, 0), 3, 20, null, null, worker2DtoList, null);
             this.timeSlotService.createTimeSlot(timeslot6Dto);
+
+            OptimizationProcessPostDto op1 = new OptimizationProcessPostDto(LocalDateTime.of(2024, 5, 11, 23,50), null);
+            OptimizationProcess op = this.optimizationProcessService.createOptimizationProcess(op1, "admin");
+
+            OfferStatus o = OfferStatus.ACTIVE;
+            TradeOfferPostDto tradeOffer1 = new TradeOfferPostDto(10, ts1.getId(), true, op.getId());
+            this.tradeOfferService.createTradeOffer(tradeOffer1, "worker1"); //wantDown
+
+            TradeOfferPostDto tradeOffer2 = new TradeOfferPostDto(10, ts1.getId(), false, op.getId());
+            this.tradeOfferService.createTradeOffer(tradeOffer2, "worker2"); //canUp
 
         }
 

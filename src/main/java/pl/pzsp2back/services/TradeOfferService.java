@@ -2,6 +2,7 @@ package pl.pzsp2back.services;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.pzsp2back.dto.TradeOfferDto;
 import pl.pzsp2back.dtoPost.TradeOfferPostDto;
 import pl.pzsp2back.exceptions.TradeOfferServiceException;
@@ -28,6 +29,7 @@ public class TradeOfferService {
         return findTradeOfferById(id);
     }
 
+    @Transactional
     public TradeOffer createTradeOffer(TradeOfferPostDto newOffer, String login) {
         User user = userService.findUserByLogin(login);
 

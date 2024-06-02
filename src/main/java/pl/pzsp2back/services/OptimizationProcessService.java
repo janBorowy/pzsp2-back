@@ -21,7 +21,7 @@ public class OptimizationProcessService {
 
     private UserService userService;
 
-
+    @Transactional
     public OptimizationProcess createOptimizationProcess(OptimizationProcessPostDto optimizationProcessPostDto, String login) {
         User userOwner = userService.findUserByLogin(login);
 
