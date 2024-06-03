@@ -56,6 +56,15 @@ public class DtoMapper {
         }
     }
 
+
+    public TradeDto toDto( Trade trade) {
+        if (trade != null) {
+            return new TradeDto(trade.getId(), trade.getFinalPrice(), trade.getTimestamp(), toDto(trade.getOptimizationProcess()), toDto(trade.getSellerOffer()), toDto(trade.getBuyerOffer()));
+        } else {
+            return null;
+        }
+    }
+
     public UserShortDto toShortDto( User user) {
         if (user != null) {
             return new UserShortDto(user.getLogin(), user.getName(), user.getSurname());

@@ -64,9 +64,6 @@ public class UserService {
         return false;
     }
 
-    public static UserShortDto mapToUserShortDto(User user) {
-        return new UserShortDto(user.getLogin(), user.getName(), user.getSurname());
-    }
 
 
 
