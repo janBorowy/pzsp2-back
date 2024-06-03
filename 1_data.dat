@@ -1,0 +1,43 @@
+
+set Pracownicy := "worker1", "worker2";
+set T := 252, 255;
+set OfertyWant := "worker1";
+
+param v0:
+    252 255:=
+"worker1" 1 0 
+"worker2" 0 1 
+;
+
+param WantDown:
+    252 255:=
+"worker1" 1 0 
+;
+
+param CanDown:
+    252 255:=
+"worker1" 1 0 
+"worker2" 0 0 
+;
+
+param CanUp:
+    252 255:=
+"worker1" 0 1 
+"worker2" 1 0 
+;
+
+param cenaWant:=
+    "worker1" 10
+;
+
+param cenaCan:
+252 255:=
+"worker1" 0 30 
+"worker2" 10 0 
+;
+
+param minLSlotow:=
+"worker1" 0
+"worker2" 0
+;
+

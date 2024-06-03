@@ -6,13 +6,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.Time;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
-
-import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 public class Mapper {
 
@@ -20,55 +16,53 @@ public class Mapper {
         List<TradeOffer> validOffers = optimizationProcess.getTradeOffersList()
                 .stream()
                 .filter(tradeOffer -> tradeOffer.getStatus() == OfferStatus.ACTIVE)
-                .collect(Collectors.toList());
+                .toList();
         List<String> allLoginsSorted = optimizationProcess.getProcessOwner().getGroup()
                 .getUsersList()
                 .stream()
+                .filter(user -> !user.getIfAdmin())
                 .map(User::getLogin)
                 .sorted()
-                .collect(Collectors.toList());
-        List<Long> offerIds = validOffers.stream()
-                .map(TradeOffer::getId)
-                .collect(Collectors.toList());
+                .toList();
         List<Long> uniqueSortedTimeslotIds = validOffers.stream()
                 .map(TradeOffer::getTimeslot)
                 .map(TimeSlot::getId)
                 .collect(Collectors.toSet())
                 .stream()
                 .sorted()
-                .collect(Collectors.toList());
+                .toList();
         List<TimeSlot> timeslots = validOffers.stream()
                 .map(TradeOffer::getTimeslot)
-                .collect(Collectors.toList());
+                .toList();
         List<TradeOffer> wantDownOffers = validOffers.stream()
                 .filter(offer -> offer.getTimeslot().getUsers().stream()
                         .map(User::getLogin)
                         .anyMatch(login -> login.equals(offer.getOfferOwner().getUsername())))
-                .filter(offer -> offer.getIfWantOffer())
-                .collect(Collectors.toList());
+                .filter(TradeOffer::getIfWantOffer)
+                .toList();
         List<String> wantDownUniqueLogins = wantDownOffers.stream()
                 .map(TradeOffer::getOfferOwner)
                 .map(User::getLogin)
                 .sorted()
-                .collect(Collectors.toList());
+                .toList();
         List<TradeOffer> canDownOffers = validOffers.stream()
                 .filter(offer -> offer.getTimeslot().getUsers().stream()
                         .map(User::getLogin)
                         .anyMatch(login -> login.equals(offer.getOfferOwner().getUsername())))
                 .filter(offer -> !offer.getIfWantOffer())
-                .collect(Collectors.toList());
+                .toList();
         List<TradeOffer> canUpOffers = validOffers.stream()
                 .filter(offer -> offer.getTimeslot().getUsers().stream()
                         .map(User::getLogin)
                         .noneMatch(login -> login.equals(offer.getOfferOwner().getUsername())))
                 .filter(offer -> !offer.getIfWantOffer())
-                .collect(Collectors.toList());
+                .toList();
         List<String> canUpUniqueLogins = canUpOffers.stream()
                 .map(TradeOffer::getOfferOwner)
                 .map(User::getLogin)
                 .sorted()
-                .collect(Collectors.toList());
-
+                .toList();
+        System.out.println("started mapping");
         File file_handler = createDateFile(optimizationProcess.getProcessOwner().getGroup().getId());
 
         try {
@@ -107,7 +101,7 @@ public class Mapper {
         }
 
         try {
-            writeCanDown(file_handler, allLoginsSorted, uniqueSortedTimeslotIds, canDownOffers);
+            writeCanDown(file_handler, allLoginsSorted, uniqueSortedTimeslotIds, canDownOffers, wantDownOffers);
         } catch (IOException e) {
             System.out.println("Error during mapping can down offers");
             e.printStackTrace();
@@ -128,7 +122,7 @@ public class Mapper {
         }
 
         try {
-            writeCenaCan(file_handler, canUpOffers, canUpUniqueLogins);
+            writeCenaCan(file_handler, canUpOffers, canUpUniqueLogins, uniqueSortedTimeslotIds);
         } catch (IOException e) {
             System.out.println("Error during mapping can price");
             e.printStackTrace();
@@ -140,6 +134,7 @@ public class Mapper {
             System.out.println("Error during mapping minLSlotow");
             e.printStackTrace();
         }
+        System.out.println("finished mapping");
 
     }
     public File createDateFile(Long groupId) {
@@ -156,7 +151,7 @@ public class Mapper {
 
     public void writeWorkers(File handler, List<String> logins) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(handler));
-        writer.write("Pracownicy := ");
+        writer.write("\nset Pracownicy := ");
         for (int i = 0; i < logins.size(); i++) {
             writer.write("\"" + logins.get(i) + "\"");
             if (i < logins.size() - 1) {
@@ -168,8 +163,8 @@ public class Mapper {
     }
 
     public void writeTimeSlots(File handler, List<Long> uniqueTimeslotIds) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter(handler));
-        writer.write("T := ");
+        BufferedWriter writer = new BufferedWriter(new FileWriter(handler, true));
+        writer.write("set T := ");
         String ids = uniqueTimeslotIds.stream()
                 .map(Object::toString)
                 .collect(Collectors.joining(", "));
@@ -179,20 +174,20 @@ public class Mapper {
     }
 
     public void writeTradeOfferts(File handler, List<String> wantDownLogins) throws IOException {
-    BufferedWriter writer = new BufferedWriter(new FileWriter(handler));
-    writer.write("OfertyWant := ");
+    BufferedWriter writer = new BufferedWriter(new FileWriter(handler, true));
+    writer.write("set OfertyWant := ");
     for (int i = 0; i < wantDownLogins.size(); i++) {
         writer.write("\"" + wantDownLogins.get(i) + "\"");
         if (i < wantDownLogins.size() - 1) {
             writer.write(", ");
         }
     }
-    writer.write(";\n");
+    writer.write(";\n\n");
     writer.close();
     }
 
     public void writeSchedule(File handler, List<String> logins, List<Long> slotsIds, List<TimeSlot> timeslots) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter(handler));
+        BufferedWriter writer = new BufferedWriter(new FileWriter(handler,true));
         writer.write("param v0:\n    ");
         String ids = slotsIds.stream()
                 .map(Object::toString)
@@ -222,7 +217,7 @@ public class Mapper {
     }
 
     public void writeWantDown(File handler, List<String> wantDownLogins, List<Long> slotsIds, List<TradeOffer> wantDownOffers) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter(handler));
+        BufferedWriter writer = new BufferedWriter(new FileWriter(handler, true));
         writer.write("param WantDown:\n    ");
         String ids = slotsIds.stream()
                 .map(Object::toString)
@@ -237,7 +232,7 @@ public class Mapper {
                         .filter(ts -> ts.getOfferOwner().getUsername().equals(offerOwnerLogin))
                         .map(TradeOffer::getTimeslot)
                         .map(TimeSlot::getId)
-                        .collect(Collectors.toList());
+                        .toList();
                 if (userOfferSlotsId.contains(slotId)){
                     writer.write("1 ");
                 } else {
@@ -250,8 +245,8 @@ public class Mapper {
         writer.close();
     }
 
-    public void writeCanDown(File handler, List<String> logins, List<Long> slotsIds, List<TradeOffer> canDownOffers) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter(handler));
+    public void writeCanDown(File handler, List<String> logins, List<Long> slotsIds, List<TradeOffer> canDownOffers, List<TradeOffer> wantDownOffers) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(handler, true));
         writer.write("param CanDown:\n    ");
         String ids = slotsIds.stream()
                 .map(Object::toString)
@@ -265,7 +260,10 @@ public class Mapper {
                 boolean hasTradeOfferWithTimeslotAndUserLogin = canDownOffers.stream()
                         .anyMatch(offer -> offer.getTimeslot().getId().equals(slotId) &&
                                 offer.getOfferOwner().getUsername().equals(offerOwnerLogin));
-                if (hasTradeOfferWithTimeslotAndUserLogin){
+                boolean hasTradeOfferWithTimeslotAndUserLogin2 = wantDownOffers.stream()
+                        .anyMatch(offer -> offer.getTimeslot().getId().equals(slotId) &&
+                                offer.getOfferOwner().getUsername().equals(offerOwnerLogin));
+                if (hasTradeOfferWithTimeslotAndUserLogin || hasTradeOfferWithTimeslotAndUserLogin2){
                     writer.write("1 ");
                 } else {
                     writer.write("0 ");
@@ -278,7 +276,7 @@ public class Mapper {
     }
 
     public void writeCanUp(File handler, List<String> logins, List<Long> slotsIds, List<TradeOffer> canUpOffers) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter(handler));
+        BufferedWriter writer = new BufferedWriter(new FileWriter(handler, true));
         writer.write("param CanUp:\n    ");
         String ids = slotsIds.stream()
                 .map(Object::toString)
@@ -305,8 +303,8 @@ public class Mapper {
     }
 
     public void writeCenaWant(File handler, List<TradeOffer> wantDownOffers, List<String> uniqueWantDownLogins) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter(handler));
-        writer.write("param cenaWant:=\n");
+        BufferedWriter writer = new BufferedWriter(new FileWriter(handler, true));
+        writer.write("param cenaWant:=\n    ");
         for(String login: uniqueWantDownLogins){
             writer.write("\"" + login + "\" ");
             Optional<TradeOffer> firstMatchingOffer = wantDownOffers.stream()
@@ -317,30 +315,39 @@ public class Mapper {
             writer.write(price + "\n");
         }
         writer.write(";\n\n");
+        writer.close();
     }
 
-    public void writeCenaCan(File handler, List<TradeOffer> canUpOffers, List<String> uniquecanUpLogins) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter(handler));
-        writer.write("param cenaCan:=\n");
-        for(String login: uniquecanUpLogins){
+    public void writeCenaCan(File handler, List<TradeOffer> canUpOffers, List<String> uniqueCanUpLogins, List<Long> slotsIds) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(handler, true));
+        writer.write("param cenaCan:\n");
+        String ids = slotsIds.stream()
+                .map(Object::toString)
+                .collect(Collectors.joining(" "));
+        writer.write(ids);
+        writer.write(":=\n");
+        for (String login : uniqueCanUpLogins) {
             writer.write("\"" + login + "\" ");
-            Optional<TradeOffer> firstMatchingOffer = canUpOffers.stream()
-                    .filter(offer -> offer.getOfferOwner().getLogin().equals(login))
-                    .findFirst();
-            Integer price =  firstMatchingOffer.map(TradeOffer::getPrice)
-                    .orElse(0);
-            writer.write(price + "\n");
+            for (Long slotId : slotsIds) {
+                Optional<TradeOffer> firstMatchingOffer = canUpOffers.stream()
+                        .filter(offer -> offer.getOfferOwner().getLogin().equals(login))
+                        .filter(offer -> offer.getTimeslot().getId().equals(slotId))
+                        .findFirst();
+                Integer price = firstMatchingOffer.map(TradeOffer::getPrice).orElse(0);
+                writer.write(price + " ");
+            }
+            writer.write("\n");
         }
         writer.write(";\n\n");
         writer.close();
     }
 
     public void writeMinLSlotow(File handler, List<String> uniqueLogins) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter(handler));
+        BufferedWriter writer = new BufferedWriter(new FileWriter(handler, true));
         writer.write("param minLSlotow:=\n");
         for(String login: uniqueLogins){
             writer.write("\"" + login + "\" ");
-            writer.write("1\n");
+            writer.write("0\n");
         }
         writer.write(";\n\n");
         writer.close();

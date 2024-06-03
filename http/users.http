@@ -34,7 +34,17 @@ Content-Type: application/json
 
 GET localhost:8080/users/admin
 Accept: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImxvZ2luIjoiYWRtaW4iLCJleHAiOjE3MTczMjk5ODd9.uxLS4kw5M-OM1Q_M80KtywCyUHjPsUChohx3AZu_Iww
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImxvZ2luIjoiYWRtaW4iLCJleHAiOjE3MTc0MjAzMzN9.UMfwe38z36rWX30bISO1kEuJ0nSMr0jqQ46iGxp7xL4
+
+{
+}
+###
+
+###
+
+GET localhost:8080/optimizationProcess/run/152
+Accept: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImxvZ2luIjoiYWRtaW4iLCJleHAiOjE3MTc0MjAzMzN9.UMfwe38z36rWX30bISO1kEuJ0nSMr0jqQ46iGxp7xL4
 
 {
 }

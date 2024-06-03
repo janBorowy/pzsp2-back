@@ -7,6 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.pzsp2back.dtoPost.OptimizationProcessPostDto;
 import pl.pzsp2back.exceptions.OptimizationProcessServiceException;
 import pl.pzsp2back.mapper.Mapper;
+import pl.pzsp2back.mapper.Result;
+import pl.pzsp2back.mapper.Runner;
 import pl.pzsp2back.orm.*;
 
 import java.time.LocalDateTime;
@@ -97,7 +99,13 @@ public class OptimizationProcessService {
         OptimizationProcess optimizationProcess = findOptimizationProcessById(id);
 
         Mapper mapper = new Mapper();
-
+        System.out.println("xxxxx");
+        mapper.mapDataFile(optimizationProcess);
+        Runner runner = new Runner();
+        System.out.println("xxxxx");
+        Result res = runner.runAmpl(optimizationProcess.getProcessOwner().getGroup().getId());
+        System.out.println("xxxxx");
+        System.out.println(res);
         //TODO write logic which will be responsible for running ampl model and (temporary) saving data
 
         return ScheduleService.getOneSchedule(optimizationProcess.getProcessOwner().getGroup().getSchedulesList());

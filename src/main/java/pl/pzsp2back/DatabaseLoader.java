@@ -96,7 +96,7 @@ public class DatabaseLoader implements CommandLineRunner {
             this.timeSlotService.createTimeSlot(timeslot3Dto);
 
             TimeSlotDto timeslot4Dto = new TimeSlotDto(null, LocalDateTime.of(2024, 5, 9, 9, 30), 5, 50, null, null, worker2DtoList, null);
-            this.timeSlotService.createTimeSlot(timeslot4Dto);
+            TimeSlot ts4 = timeSlotService.createTimeSlot(timeslot4Dto);
 
             TimeSlotDto timeslot5Dto = new TimeSlotDto(null, LocalDateTime.of(2024, 5, 10, 15, 30), 8, 200, null, null, worker2DtoList, null);
             this.timeSlotService.createTimeSlot(timeslot5Dto);
@@ -113,6 +113,9 @@ public class DatabaseLoader implements CommandLineRunner {
 
             TradeOfferPostDto tradeOffer2 = new TradeOfferPostDto(10, ts1.getId(), false, op.getId());
             this.tradeOfferService.createTradeOffer(tradeOffer2, "worker2"); //canUp
+
+            TradeOfferPostDto tradeOffer3 = new TradeOfferPostDto(30, ts4.getId(), false, op.getId());
+            this.tradeOfferService.createTradeOffer(tradeOffer3, "worker1"); //canUp
 
         }
 

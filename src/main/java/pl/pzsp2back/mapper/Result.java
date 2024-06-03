@@ -35,4 +35,30 @@ public class Result {
     public void setvUp(Map<String, Long> vUp) {
         this.vUp = vUp;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("Result {\n");
+
+        sb.append("  timeSlotsPrices:\n");
+        for (Map.Entry<Long, Integer> entry : timeSlotsPrices.entrySet()) {
+            sb.append("    ").append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
+        }
+
+        sb.append("  vDown:\n");
+        for (Map.Entry<String, Long> entry : vDown.entrySet()) {
+            sb.append("    ").append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
+        }
+
+        sb.append("  vUp:\n");
+        for (Map.Entry<String, Long> entry : vUp.entrySet()) {
+            sb.append("    ").append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
+        }
+
+        sb.append("}");
+
+        return sb.toString();
+    }
 }

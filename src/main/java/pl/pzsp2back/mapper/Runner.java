@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Runner {
-    public Result runAmpl() {
+    public Result runAmpl(Long groupId) {
         Map<Long, Integer> timeSlotsPrices = new HashMap<>();
         Map<String, Long> vUp = new HashMap<>();
         Map<String, Long> vDown = new HashMap<>();
@@ -23,6 +23,11 @@ public class Runner {
             // Odczytanie wyników z ampl
             String line;
 
+            // reset ampla
+            process.getOutputStream().write("reset;\n".getBytes());
+            process.getOutputStream().flush();
+            System.out.println("zresetowano ampl");
+
             // Wybór optymalizatora w amplu
             process.getOutputStream().write("option solver minos;\n".getBytes());
             process.getOutputStream().flush();
@@ -31,7 +36,7 @@ public class Runner {
             // Wybór pliku .mod i pliku .dat - odpowiednia ścieżka do pliku
             process.getOutputStream().write("model maxsloty.mod;\n".getBytes());
             process.getOutputStream().flush();
-            process.getOutputStream().write("data maxsloty.dat;\n".getBytes());
+            process.getOutputStream().write(("data " + groupId + "_data.dat;\n").getBytes());
             process.getOutputStream().flush();
 
             // Optymalizacja i odczyt wyników
