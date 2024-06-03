@@ -49,4 +49,20 @@ public class TradeController {
         }
     }
 
+
+    @Operation(summary = "Get trade object for given trade_offer id (only if trade_offer is realized positive)")
+    @GetMapping("/fromTradeOffer/{id}")
+    public ResponseEntity<?> getUserTradeOffers(@AuthenticationPrincipal User requesterUser, Long id) {
+        try {
+
+            TradeDto trade = dtoMapper.toDto(tradeService.getTradeFromOffer(id));
+
+            return ResponseEntity.ok(trade);
+        } catch (TradeOfferServiceException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+
+
 }
