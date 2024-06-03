@@ -98,6 +98,7 @@ public class TradeOfferController {
     @PostMapping("/{login}")
     public ResponseEntity<?> createTradeOffer(@AuthenticationPrincipal User requesterUser, @Valid @RequestBody TradeOfferPostDto tradeOfferPostDto, @PathVariable("login") String login) {
         try {
+            System.out.println(requesterUser.getIfAdmin());
             if (!requesterUser.getIfAdmin()) {
                 var createdOfferDto = dtoMapper.toDto(tradeOfferService.createTradeOffer(tradeOfferPostDto, requesterUser.getLogin()));
                 return ResponseEntity.ok(createdOfferDto);

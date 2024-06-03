@@ -1,6 +1,31 @@
+### get schedule for worker1 with anonimize data
 GET http://localhost:8080/schedules/worker2
 Accept: application/json
 Authorization: Bearer {{worker2_token}}
 
 {
 }
+
+### get schedule for admins
+GET http://localhost:8080/schedules/admin
+Accept: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+}
+
+
+
+### get schedule for admins
+GET http://localhost:8080/schedules/admin
+Accept: application/json
+Authorization: Bearer {{worker1_token}}
+
+{
+}
+
+> {%
+client.test("Request should return 403", function() {
+    client.assert(response.status === 403, "Expected status 403, but got " + response.status);
+});
+%}

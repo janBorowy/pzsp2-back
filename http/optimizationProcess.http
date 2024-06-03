@@ -5,8 +5,6 @@ Authorization: Bearer {{admin_token}}
 {
 }
 
-
-
 ### update optimization process all data
 PUT http://localhost:8080/optimizationProcess/
 Content-Type: application/json
@@ -44,6 +42,16 @@ client.test("Request should return 400", function() {
 %}
 
 
+### try update optimization process with null data (no changes in object)
+PUT http://localhost:8080/optimizationProcess/
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "offerAcceptanceDeadline": "",
+  "optimizationTime": ""
+}
+
 ### try update optimization process with invalid data
 PUT http://localhost:8080/optimizationProcess/
 Content-Type: application/json
@@ -54,11 +62,11 @@ Authorization: Bearer {{admin_token}}
   "optimizationTime": "2024-06-11T18:06:07.218Z"
 }
 
-> {
+> {%
 client.test("Request should return 400", function() {
     client.assert(response.status === 400, "Expected status 400, but got " + response.status);
 });
-}
+%}
 
 ### try tu update optimization process from user account
 PUT http://localhost:8080/optimizationProcess/
@@ -70,11 +78,11 @@ Authorization: Bearer {{worker1_token}}
   "optimizationTime": "2024-06-11T18:06:07.218Z"
 }
 
-> {
+> {%
 client.test("Request should return 403", function() {
     client.assert(response.status === 403, "Expected status 403, but got " + response.status);
 });
-}
+%}
 
 
 #### create optimization process with optimization time

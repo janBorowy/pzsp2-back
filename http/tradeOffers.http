@@ -7,7 +7,7 @@ Authorization: Bearer {{worker1_token}}
 }
 
 > {%
-    client.global.set("worker1_timeslot_id", response.body.timeSlots[0].id);
+    client.global.set("worker1_timeslot_id", response.body.timeSlots[2].id);
 %}
 
 ### post offert without optimization process id
@@ -21,6 +21,65 @@ Authorization: Bearer {{worker1_token}}
   "ifWantOffer": true
 }
 
+> {%
+client.test("Request should return 200", function() {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+});
+client.global.set("worker1_tradeoffer_id", response.body.id);
+%}
+
+### get created offer
+GET {{url}}/tradeOffers/{{worker1_tradeoffer_id}}
+Accept: application/json
+Authorization: Bearer {{worker1_token}}
+
+> {%
+client.test("Request should return 200", function() {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+});
+%}
+
+### get created offer from diffrent user ERROR expected
+GET {{url}}/tradeOffers/{{worker1_tradeoffer_id}}
+Accept: application/json
+Authorization: Bearer {{worker2_token}}
+
+> {%
+client.test("Request should return 403", function() {
+    client.assert(response.status === 403, "Expected status 403, but got " + response.status);
+});
+%}
+
+
+### delete posted offer from diffrent user ERROR expected
+DELETE {{url}}/tradeOffers/{{worker1_tradeoffer_id}}
+Content-Type: application/json
+Authorization: Bearer {{worker2_token}}
+
+{
+}
+
+
+> {%
+client.test("Request should return 403", function() {
+    client.assert(response.status === 403, "Expected status 403, but got " + response.status);
+});
+%}
+
+
+### delete posted offer from correct user
+DELETE {{url}}/tradeOffers/{{worker1_tradeoffer_id}}
+Content-Type: application/json
+Authorization: Bearer {{worker1_token}}
+
+{
+}
+
+> {%
+client.test("Request should return 200", function() {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+});
+%}
 
 ### post offert without optimization process id
 POST {{url}}/tradeOffers/worker2
@@ -30,5 +89,44 @@ Authorization: Bearer {{worker2_token}}
 {
   "price": {{$randomInt}},
   "timeSlotId": {{worker1_timeslot_id}},
-  "ifWantOffer": true
+  "ifWantOffer": false
 }
+
+> {%
+client.test("Request should return 200", function() {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+});
+client.global.set("worker2_tradeoffer_id", response.body.id);
+%}
+
+### create offer as a admin ERROR expected
+POST {{url}}/tradeOffers/admin
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "price": {{$randomInt}},
+  "timeSlotId": {{worker1_timeslot_id}},
+  "ifWantOffer": false
+}
+
+> {%
+client.test("Request should return 403", function() {
+    client.assert(response.status === 403, "Expected status 403, but got " + response.status);
+});
+%}
+
+### delete trade offer as a admin
+DELETE {{url}}/tradeOffers/{{worker2_tradeoffer_id}}
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+}
+
+> {%
+client.test("Request should return 200", function() {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+});
+client.global.set("worker2_tradeoffer_id", response.body.id);
+%}
