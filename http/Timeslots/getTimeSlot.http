@@ -1,1 +1,3 @@
-GET http://localhost:8080/timeslots/2752
+GET http://localhost:8080/timeslots/402
+Accept: application/json
+Authorization: Bearer {{admin_token}}

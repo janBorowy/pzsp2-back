@@ -1,0 +1,40 @@
+
+# @name setting admin token
+POST {{url}}/auth/signin
+Content-Type: application/json
+
+{
+  "login": "admin",
+  "password": "adminpass"
+}
+
+> {%
+    client.global.set("admin_token", response.body.token);
+%}
+
+### setting worker1 token
+POST {{url}}/auth/signin
+Content-Type: application/json
+
+{
+  "login": "worker1",
+  "password": "password1"
+}
+
+> {%
+    client.global.set("worker1_token", response.body.token);
+%}
+
+
+### setting worker2 token
+POST {{url}}/auth/signin
+Content-Type: application/json
+
+{
+  "login": "worker2",
+  "password": "password2"
+}
+
+> {%
+    client.global.set("worker2_token", response.body.token);
+%}

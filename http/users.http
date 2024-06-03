@@ -1,4 +1,4 @@
-POST localhost:8080/auth/signup
+POST {{url}}/auth/signup
 Content-Type: application/json
 
 {
@@ -12,7 +12,7 @@ Content-Type: application/json
 
 ###
 
-POST localhost:8080/auth/signin
+POST {{url}}/auth/signin
 Content-Type: application/json
 
 {
@@ -22,7 +22,7 @@ Content-Type: application/json
 
 ###
 
-POST localhost:8080/auth/signin
+POST {{url}}/auth/signin
 Content-Type: application/json
 
 {
@@ -34,7 +34,7 @@ Content-Type: application/json
 
 GET localhost:8080/users/admin
 Accept: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImxvZ2luIjoiYWRtaW4iLCJleHAiOjE3MTc0MjAzMzN9.UMfwe38z36rWX30bISO1kEuJ0nSMr0jqQ46iGxp7xL4
+Authorization: {{admin_token}}
 
 {
 }
@@ -48,6 +48,16 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImxvZ2lu
 
 {
 }
+###
+
+GET localhost:8080/optimizationProcess/run/
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImxvZ2luIjoiYWRtaW4iLCJleHAiOjE3MTc0MDcwMzJ9.hcbPRL2TtjeE9BECBZdSJgcnFWyMxy5-Jbn-RObvddk
+
+{
+}
+
+
 ###
 
 PUT {{url}}//users

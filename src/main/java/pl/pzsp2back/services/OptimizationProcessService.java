@@ -2,6 +2,7 @@ package pl.pzsp2back.services;
 
 
 import lombok.AllArgsConstructor;
+import org.springframework.boot.autoconfigure.quartz.QuartzTransactionManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pzsp2back.dtoPost.OptimizationProcessPostDto;
@@ -54,6 +55,21 @@ public class OptimizationProcessService {
         return nearest;
     }
 
+    public OptimizationProcess getAnyOptimizationProcess(String login) {
+        User user = userService.findUserByLogin(login);
+        Schedule schedule =  ScheduleService.getOneSchedule(user.getGroup().getSchedulesList());
+
+        List<OptimizationProcess> optimizationProcesses = optimizationProcessRepository.findOptimizationProcessByScheduleOrderByOfferAcceptanceDeadline(schedule);
+
+        if (optimizationProcesses.isEmpty()) {
+            throw new OptimizationProcessServiceException("Schedule doesn't have any optimization process assigned");
+        } else if ( optimizationProcesses.size() > 1) {
+            throw new OptimizationProcessServiceException("Schedule has more than one optimization process assigned");
+        }
+
+        return optimizationProcesses.get(0) ;
+    }
+
 
     @Transactional
     public List<OptimizationProcess> getAllOptimizationProcess(String login) {
@@ -68,6 +84,7 @@ public class OptimizationProcessService {
     }
 
 
+    @Transactional
     public OptimizationProcess updateOptimizationProcess(Long id, OptimizationProcessPostDto optimizationProcessPostDto) {
 
         OptimizationProcess optimizationProcess = findOptimizationProcessById(id);
@@ -86,6 +103,37 @@ public class OptimizationProcessService {
         return optimizationProcessRepository.save(optimizationProcess);
     }
 
+    @Transactional
+    public OptimizationProcess updateAnyOptimizationProcess(String login, OptimizationProcessPostDto optimizationProcessPostDto) {
+
+        User user = userService.findUserByLogin(login);
+        Schedule schedule = ScheduleService.getOneSchedule(user.getGroup().getSchedulesList());
+
+        List<OptimizationProcess> optimizationProcesses = optimizationProcessRepository.findOptimizationProcessByScheduleOrderByOfferAcceptanceDeadline(schedule);
+
+        OptimizationProcess any = null;
+
+        if (optimizationProcesses.isEmpty()) {
+            throw new OptimizationProcessServiceException("Schedule doesn't have assigned any optimization process");
+        }
+        any = optimizationProcesses.get(0);
+
+        if (optimizationProcessPostDto.offerAcceptanceDeadline() != null) {
+            any.setOfferAcceptanceDeadline(optimizationProcessPostDto.offerAcceptanceDeadline());
+        }
+
+        if (optimizationProcessPostDto.optimizationTime() != null) {
+            if (optimizationProcessPostDto.optimizationTime().isBefore(any.getOfferAcceptanceDeadline())) {
+                throw new OptimizationProcessServiceException("Optimization time is before offer acceptance deadline!");
+            }
+            any.setOptimizationTime(optimizationProcessPostDto.optimizationTime());
+        }
+
+        return optimizationProcessRepository.save(any);
+
+    }
+
+    @Transactional
     public OptimizationProcess deleteOptimizationProcess(Long id) {
 
         OptimizationProcess optimizationProcess = findOptimizationProcessById(id);
@@ -95,6 +143,7 @@ public class OptimizationProcessService {
         return optimizationProcess;
     }
 
+    @Transactional
     public Schedule runOptimizationProcess(Long id) {
         OptimizationProcess optimizationProcess = findOptimizationProcessById(id);
 
@@ -109,6 +158,19 @@ public class OptimizationProcessService {
         //TODO write logic which will be responsible for running ampl model and (temporary) saving data
 
         return ScheduleService.getOneSchedule(optimizationProcess.getProcessOwner().getGroup().getSchedulesList());
+    }
+
+    public boolean ifUserIsProcessOwner(String login, Long processId) {
+        OptimizationProcess op = getOptimizationProcess(processId);
+        return op.getProcessOwner().getLogin().equals(login);
+
+    }
+
+    public boolean ifSameGroup(String login, Long processId) {
+        OptimizationProcess op = getOptimizationProcess(processId);
+        List<User> usersList = op.getSchedule().getGroup().getUsersList();
+        return usersList.stream().anyMatch(u -> u.getLogin().equals(login));
+
     }
 
 

@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface OptimizationProcessRepository extends CrudRepository<OptimizationProcess, Long> {
     List<OptimizationProcess> findOptimizationProcessByScheduleAndOfferAcceptanceDeadlineAfterOrderByOfferAcceptanceDeadline(Schedule schedule, LocalDateTime optimizationTime);
+    List<OptimizationProcess> findOptimizationProcessByScheduleOrderByOfferAcceptanceDeadline(Schedule schedule);
 
 }

@@ -1,6 +1,7 @@
 package pl.pzsp2back.services;
 
 import lombok.AllArgsConstructor;
+import org.mockito.internal.verification.Times;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pzsp2back.dto.TimeSlotDto;
@@ -114,6 +115,13 @@ public class TimeSlotService {
         return timeslot;
     }
 
+    public boolean ifSameGroup(String login, Long timeslotId) {
+        User user = userService.getUser(login);
+        TimeSlot ts = getTimeSlot(timeslotId);
+
+        return user.getGroup().getId().equals(ts.getSchedule().getGroup().getId());
+    }
+
     private TimeSlot findTimeSlotById(Long id) {
         return timeslotRepository.findById(id).orElseThrow(
                 () -> new TimeSlotServiceException("Timeslot not found with given id: " + id)
@@ -121,6 +129,8 @@ public class TimeSlotService {
     }
 
 
-
-
+    public boolean ifTimeSlotWorker(String login, Long id) {
+        var ts = getTimeSlot(id);
+        return ts.getUsers().stream().anyMatch(u -> u.getLogin().equals(login));
+    }
 }

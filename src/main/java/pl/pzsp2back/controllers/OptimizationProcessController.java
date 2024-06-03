@@ -4,7 +4,9 @@ package pl.pzsp2back.controllers;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pl.pzsp2back.dto.DtoMapper;
 import pl.pzsp2back.dto.OptimizationProcessDto;
@@ -12,6 +14,8 @@ import pl.pzsp2back.dto.ScheduleDto;
 import pl.pzsp2back.dtoPost.OptimizationProcessPostDto;
 import pl.pzsp2back.exceptions.OptimizationProcessServiceException;
 import pl.pzsp2back.exceptions.TradeOfferServiceException;
+import pl.pzsp2back.orm.OptimizationProcess;
+import pl.pzsp2back.orm.User;
 import pl.pzsp2back.services.OptimizationProcessService;
 
 import java.util.stream.Collectors;
@@ -24,22 +28,38 @@ public class OptimizationProcessController {
     private final OptimizationProcessService optimizationProcessService;
     private final DtoMapper dtoMapper;
 
-    @Operation(summary = "Get Optimization Process with given id")
+    @Operation(summary = "[DONT USE] Get Optimization Process with given id")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getOptimizationProcess(@PathVariable("id") Long id) {
+    public ResponseEntity<?> getOptimizationProcess(@AuthenticationPrincipal User requesterUser, @PathVariable("id") Long id) {
         try {
-            var optimizationProcessDto = optimizationProcessService.getOptimizationProcess(id);
+            if (optimizationProcessService.ifSameGroup(requesterUser.getLogin(), id)) {
+                var optimizationProcessDto = optimizationProcessService.getOptimizationProcess(id);
+                return ResponseEntity.ok(optimizationProcessDto);
+            }
+            return new ResponseEntity<>("Action forbidden for this user.", HttpStatus.FORBIDDEN);
+
+        } catch (OptimizationProcessServiceException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @Operation(summary = "Get first by deadline date optimization process with nearest acceptance deadline date")
+    @GetMapping("/")
+    public ResponseEntity<?> getAnyOptimizationProcess(@AuthenticationPrincipal User requesterUser) {
+        try {
+            var optimizationProcessDto = dtoMapper.toDto(optimizationProcessService.getAnyOptimizationProcess(requesterUser.getLogin()));
             return ResponseEntity.ok(optimizationProcessDto);
         } catch (OptimizationProcessServiceException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
-    @Operation(summary = "Get Optimization Process with nearest acceptance deadline date")
+
+    @Operation(summary = "[DONT USE] Get Optimization Process with nearest acceptance deadline date")
     @GetMapping("/nearest/{login}")
-    public ResponseEntity<?> getNearestOptimizationProcess(@PathVariable("login") String login) {
+    public ResponseEntity<?> getNearestOptimizationProcess(@AuthenticationPrincipal User requesterUser, @PathVariable("login") String login) {
         try {
-            var optimizationProcessDto = dtoMapper.toDto(optimizationProcessService.getNearestAcceptanceDeadlineOptimizationProcess(login));
+            var optimizationProcessDto = dtoMapper.toDto(optimizationProcessService.getNearestAcceptanceDeadlineOptimizationProcess(requesterUser.getLogin()));
             return ResponseEntity.ok(optimizationProcessDto);
         } catch (OptimizationProcessServiceException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -47,11 +67,11 @@ public class OptimizationProcessController {
     }
 
 
-    @Operation(summary = "Get all optimization processes for given user (login)")
+    @Operation(summary = "[DONT USE] Get all optimization processes for given user (login)")
     @GetMapping("/all/{login}")
-    public ResponseEntity<?> getAllOptimizationProcesses(@PathVariable("login") String login) {
+    public ResponseEntity<?> getAllOptimizationProcesses(@AuthenticationPrincipal User requesterUser, @PathVariable("login") String login) {
         try {
-            var optimizationProcessDtoList = optimizationProcessService.getAllOptimizationProcess(login).stream().map(op -> dtoMapper.toDto(op)).collect(Collectors.toList());
+            var optimizationProcessDtoList = optimizationProcessService.getAllOptimizationProcess(requesterUser.getLogin()).stream().map(op -> dtoMapper.toDto(op)).collect(Collectors.toList());
             return ResponseEntity.ok(optimizationProcessDtoList);
         } catch (TradeOfferServiceException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -59,7 +79,7 @@ public class OptimizationProcessController {
     }
 
 
-    @Operation(summary = "Create new optimization process [admin only]",
+    @Operation(summary = "[DONT USE] Create new optimization process [admin only]",
             description = """
                     OfferAcceptanceDeadline: must be given and this date must be before optimization time date \n
                     OptimizationTime: can be null \n
@@ -67,16 +87,20 @@ public class OptimizationProcessController {
                     return: created optimization process
                     """)
     @PostMapping("/{login}")
-    public ResponseEntity<?> createOptimizationProcess(@Valid @RequestBody OptimizationProcessPostDto optimizationProcessPostDto, @PathVariable("login") String login) {
+    public ResponseEntity<?> createOptimizationProcess(@AuthenticationPrincipal User requesterUser, @Valid @RequestBody OptimizationProcessPostDto optimizationProcessPostDto, @PathVariable("login") String login) {
         try {
-            OptimizationProcessDto savedOptimizationProcessDto = dtoMapper.toDto(optimizationProcessService.createOptimizationProcess(optimizationProcessPostDto, login));
-            return ResponseEntity.ok(savedOptimizationProcessDto);
+            if(requesterUser.getIfAdmin()) {
+                OptimizationProcessDto savedOptimizationProcessDto = dtoMapper.toDto(optimizationProcessService.createOptimizationProcess(optimizationProcessPostDto, requesterUser.getLogin()));
+                return ResponseEntity.ok(savedOptimizationProcessDto);
+            }
+            return new ResponseEntity<>("Action forbidden for this user.", HttpStatus.FORBIDDEN);
+
         } catch (OptimizationProcessServiceException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
-    @Operation(summary = "Create new optimization process [admin only]",
+    @Operation(summary = "[DONT USE] Update optimization process [admin only]",
             description = """
                     
                     All values can be null. Not given values wouldn't be changed.
@@ -84,10 +108,35 @@ public class OptimizationProcessController {
                     return: created optimization process
                     """)
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateOptimizationProcess(@PathVariable("id") Long id, @Valid @RequestBody OptimizationProcessPostDto optimizationProcessPostDto) {
+    public ResponseEntity<?> updateOptimizationProcess(@AuthenticationPrincipal User requesterUser, @PathVariable("id") Long id, @Valid @RequestBody OptimizationProcessPostDto optimizationProcessPostDto) {
         try {
-            var updatedOptimizationProcess = dtoMapper.toDto(optimizationProcessService.updateOptimizationProcess(id, optimizationProcessPostDto));
-            return ResponseEntity.ok(updatedOptimizationProcess);
+            if(requesterUser.getIfAdmin() &&  optimizationProcessService.ifUserIsProcessOwner(requesterUser.getLogin(), id)) {
+                var updatedOptimizationProcess = dtoMapper.toDto(optimizationProcessService.updateOptimizationProcess(id, optimizationProcessPostDto));
+                return ResponseEntity.ok(updatedOptimizationProcess);
+            }
+            return new ResponseEntity<>("Action forbidden for this user.", HttpStatus.FORBIDDEN);
+
+        } catch (OptimizationProcessServiceException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @Operation(summary = "Update first by date optimization process [admin only]",
+            description = """
+                    
+                    All values can be null. Not given values wouldn't be changed.
+                    
+                    return: created optimization process
+                    """)
+    @PutMapping("/")
+    public ResponseEntity<?> updateAnyOptimizationProcess(@AuthenticationPrincipal User requesterUser, @Valid @RequestBody OptimizationProcessPostDto optimizationProcessPostDto) {
+        try {
+            if(requesterUser.getIfAdmin()) {
+                var updatedOptimizationProcess = dtoMapper.toDto(optimizationProcessService.updateAnyOptimizationProcess(requesterUser.getLogin(), optimizationProcessPostDto));
+                return ResponseEntity.ok(updatedOptimizationProcess);
+            }
+            return new ResponseEntity<>("Action forbidden for this user.", HttpStatus.FORBIDDEN);
+
         } catch (OptimizationProcessServiceException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -99,10 +148,13 @@ public class OptimizationProcessController {
                     return: optimized schedule 
                     """)
     @GetMapping("/run/{id}")
-    public ResponseEntity<?> runOptimization(@PathVariable("id") Long id) {
+    public ResponseEntity<?> runOptimization(@AuthenticationPrincipal User requesterUser, @PathVariable("id") Long id) {
         try {
-            ScheduleDto optimizedScheduleDto = dtoMapper.toDto(optimizationProcessService.runOptimizationProcess(id));
-            return ResponseEntity.ok(optimizedScheduleDto);
+            if(requesterUser.getIfAdmin() &&  optimizationProcessService.ifUserIsProcessOwner(requesterUser.getLogin(), id)) {
+                ScheduleDto optimizedScheduleDto = dtoMapper.toDto(optimizationProcessService.runOptimizationProcess(id));
+                return ResponseEntity.ok(optimizedScheduleDto);
+            }
+            return new ResponseEntity<>("Action forbidden for this user.", HttpStatus.FORBIDDEN);
         } catch (OptimizationProcessServiceException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -120,15 +172,18 @@ public class OptimizationProcessController {
 //    }
 
 
-    @Operation(summary = "Delete optimization process [admin only]",
+    @Operation(summary = "[DONT USE] Delete optimization process [admin only]",
             description = """
                     return: deleted optimization process 
                     """)
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteOptimizationProcess(@PathVariable("id") Long id) {
+    public ResponseEntity<?> deleteOptimizationProcess(@AuthenticationPrincipal User requesterUser, @PathVariable("id") Long id) {
         try {
-            var deletedProcessDto = dtoMapper.toDto(optimizationProcessService.deleteOptimizationProcess(id));
-            return ResponseEntity.ok(deletedProcessDto);
+            if(requesterUser.getIfAdmin() &&  optimizationProcessService.ifUserIsProcessOwner(requesterUser.getLogin(), id)) {
+                 OptimizationProcessDto deletedProcessDto = dtoMapper.toDto(optimizationProcessService.deleteOptimizationProcess(id));
+                return ResponseEntity.ok(deletedProcessDto);
+            }
+            return new ResponseEntity<>("Action forbidden for this user.", HttpStatus.FORBIDDEN);
         } catch (OptimizationProcessServiceException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

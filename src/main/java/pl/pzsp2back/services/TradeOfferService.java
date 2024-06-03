@@ -9,6 +9,7 @@ import pl.pzsp2back.exceptions.TradeOfferServiceException;
 import pl.pzsp2back.orm.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,12 +39,18 @@ public class TradeOfferService {
         OptimizationProcess optimizationProcess;
 
         if (newOffer.optimizationProcessId() == null) {
-            optimizationProcess = optimizationProcessService.getNearestAcceptanceDeadlineOptimizationProcess(login);
+            optimizationProcess = optimizationProcessService.getAnyOptimizationProcess(login);
         } else {
             optimizationProcess = optimizationProcessService.getOptimizationProcess(newOffer.optimizationProcessId());
         }
 
         TradeOffer existingTradeOffer = tradeOfferRepository.findTradeOfferByOptimizationProcessAndOfferOwnerAndTimeslot(optimizationProcess, user, timeSlot);
+
+        if (optimizationProcess==null)
+        {
+            throw new TradeOfferServiceException("Schedule doesn't have any up-to date optimization processes assigned.");
+        }
+
 
         if(existingTradeOffer != null) {
             throw new TradeOfferServiceException("This trade offer already exists. Offer ID: "+existingTradeOffer.getId());
@@ -85,11 +92,31 @@ public class TradeOfferService {
         return offer;
     }
 
+    public boolean ifSameGroup(String login, Long offerId){
+        User user = userService.getUser(login);
+        var ts = getTradeOffer(offerId);
+        return ts.getOfferOwner().getGroup().getUsersList().stream().anyMatch(u -> u.getLogin().equals(login));
+    }
+
+
+    public boolean ifOfferOwner(String login, Long offerId){
+        var ts = getTradeOffer(offerId);
+        return ts.getOfferOwner().getLogin().equals(login);
+    }
+
     private TradeOffer findTradeOfferById(Long id) {
         return tradeOfferRepository.findById(id)
                 .orElseThrow(() -> new TradeOfferServiceException("Trade offer not found!"));
     }
 
-
-
+    @Transactional
+    public List<TradeOffer> getGroupTradeOffers(String login) {
+        User user = userService.getUser(login);
+        var usersList = user.getGroup().getUsersList();
+        List<TradeOffer> groupTradeOffers = new ArrayList<>();
+        for (User u : usersList) {
+            groupTradeOffers.addAll(u.getListTradeOffers());
+        }
+        return groupTradeOffers;
+    }
 }

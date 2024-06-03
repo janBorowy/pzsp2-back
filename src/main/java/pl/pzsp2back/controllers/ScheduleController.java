@@ -30,6 +30,7 @@ public class ScheduleController {
         if (login.isEmpty()) {
             return ResponseEntity.badRequest().body("Login not specified");
         }
+
         try {
             var schedule = scheduleService.getGroupScheduleByLogin(login);
             ScheduleDto scheduleDto;

@@ -1,0 +1,34 @@
+###set global sample timeslot id for worker1
+GET http://localhost:8080/schedules/worker1
+Accept: application/json
+Authorization: Bearer {{worker1_token}}
+
+{
+}
+
+> {%
+    client.global.set("worker1_timeslot_id", response.body.timeSlots[0].id);
+%}
+
+### post offert without optimization process id
+POST {{url}}/tradeOffers/worker1
+Content-Type: application/json
+Authorization: Bearer {{worker1_token}}
+
+{
+  "price": {{$randomInt}},
+  "timeSlotId": {{worker1_timeslot_id}},
+  "ifWantOffer": true
+}
+
+
+### post offert without optimization process id
+POST {{url}}/tradeOffers/worker2
+Content-Type: application/json
+Authorization: Bearer {{worker2_token}}
+
+{
+  "price": {{$randomInt}},
+  "timeSlotId": {{worker1_timeslot_id}},
+  "ifWantOffer": true
+}

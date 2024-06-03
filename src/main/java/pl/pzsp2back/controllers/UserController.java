@@ -28,6 +28,7 @@ public class UserController {
         if (login.isEmpty()) {
             return ResponseEntity.badRequest().body("Login not specified");
         }
+
         try {
             UserDto userDto;
             if ((requesterUser.getIfAdmin() && userService.ifSameGroup(requesterUser.getLogin(), login)) || requesterUser.getLogin().equals(login)) {
