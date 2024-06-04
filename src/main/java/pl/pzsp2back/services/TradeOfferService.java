@@ -1,6 +1,7 @@
 package pl.pzsp2back.services;
 
 import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pzsp2back.dto.TradeOfferDto;
@@ -19,7 +20,7 @@ public class TradeOfferService {
     private final TradeOfferRepository tradeOfferRepository;
     private final UserService userService;
     private final TimeSlotService timeSlotService;
-    private final OptimizationProcessService optimizationProcessService;
+    private final @Lazy OptimizationProcessService optimizationProcessService;
 
     public List<TradeOffer> getUserTradeOffers(String login) {
         User user = userService.findUserByLogin(login);
@@ -118,5 +119,19 @@ public class TradeOfferService {
             groupTradeOffers.addAll(u.getListTradeOffers());
         }
         return groupTradeOffers;
+    }
+
+    @Transactional
+    public TradeOffer updateTradeOfferStatus(Long id, OfferStatus status) {
+        TradeOffer offer = findTradeOfferById(id);
+        offer.setStatus(status);
+        return tradeOfferRepository.save(offer);
+    }
+
+    @Transactional
+    public TradeOffer getTradeOfferByOwnerLoginAndTimeSlotId(String ownerLogin, Long timeSlotId) {
+        User owner = userService.getUser(ownerLogin);
+        TimeSlot timeSlot = timeSlotService.getTimeSlot(timeSlotId);
+        return tradeOfferRepository.findByOfferOwnerAndTimeslot(owner, timeSlot);
     }
 }

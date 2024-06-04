@@ -60,6 +60,8 @@ public class Mapper {
         List<String> canUpUniqueLogins = canUpOffers.stream()
                 .map(TradeOffer::getOfferOwner)
                 .map(User::getLogin)
+                .collect(Collectors.toSet())
+                .stream()
                 .sorted()
                 .toList();
         System.out.println("started mapping");

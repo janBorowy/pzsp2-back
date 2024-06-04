@@ -115,6 +115,13 @@ public class TimeSlotService {
         return timeslot;
     }
 
+    @Transactional
+    public TimeSlot updateLastMarketPrice(Long id, Integer newPrice) {
+        TimeSlot timeslot = findTimeSlotById(id);
+        timeslot.setLastMarketPrice(newPrice);
+        return timeslotRepository.save(timeslot);
+    }
+
     public boolean ifSameGroup(String login, Long timeslotId) {
         User user = userService.getUser(login);
         TimeSlot ts = getTimeSlot(timeslotId);
@@ -132,5 +139,27 @@ public class TimeSlotService {
     public boolean ifTimeSlotWorker(String login, Long id) {
         var ts = getTimeSlot(id);
         return ts.getUsers().stream().anyMatch(u -> u.getLogin().equals(login));
+    }
+
+    public TimeSlot removeUserFromTimeSlot(Long timeslotId, String userLogin) {
+        TimeSlot timeslot = findTimeSlotById(timeslotId);
+        List<User> users = timeslot.getUsers();
+        User userToRemove = users.stream()
+                .filter(user -> user.getLogin().equals(userLogin))
+                .findFirst()
+                .orElseThrow(() -> new TimeSlotServiceException("User with login " + userLogin + " not found in timeslot users"));
+        users.remove(userToRemove);
+        timeslot.setUsers(users);
+        return timeslotRepository.save(timeslot);
+    }
+
+    public TimeSlot addUserToTimeSlot(Long timeslotId, String userLogin) {
+        TimeSlot timeslot = findTimeSlotById(timeslotId);
+        User userToAdd = userService.getUser(userLogin);
+        if (timeslot.getUsers().contains(userToAdd)) {
+            throw new TimeSlotServiceException("User with login " + userLogin + " is already assigned to the timeslot.");
+        }
+        timeslot.getUsers().add(userToAdd);
+        return timeslotRepository.save(timeslot);
     }
 }

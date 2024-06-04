@@ -3,8 +3,10 @@ package pl.pzsp2back.services;
 
 import lombok.AllArgsConstructor;
 import org.springframework.boot.autoconfigure.quartz.QuartzTransactionManager;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.pzsp2back.dto.TimeSlotDto;
 import pl.pzsp2back.dtoPost.OptimizationProcessPostDto;
 import pl.pzsp2back.exceptions.OptimizationProcessServiceException;
 import pl.pzsp2back.mapper.Mapper;
@@ -14,6 +16,7 @@ import pl.pzsp2back.orm.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -23,6 +26,7 @@ public class OptimizationProcessService {
     private final OptimizationProcessRepository optimizationProcessRepository;
 
     private UserService userService;
+    private TimeSlotService timeSlotService;
 
     @Transactional
     public OptimizationProcess createOptimizationProcess(OptimizationProcessPostDto optimizationProcessPostDto, String login) {
@@ -148,14 +152,35 @@ public class OptimizationProcessService {
         OptimizationProcess optimizationProcess = findOptimizationProcessById(id);
 
         Mapper mapper = new Mapper();
-        System.out.println("xxxxx");
         mapper.mapDataFile(optimizationProcess);
         Runner runner = new Runner();
-        System.out.println("xxxxx");
         Result res = runner.runAmpl(optimizationProcess.getProcessOwner().getGroup().getId());
-        System.out.println("xxxxx");
         System.out.println(res);
-        //TODO write logic which will be responsible for running ampl model and (temporary) saving data
+
+        Map<Long, Integer> prices = res.getTimeSlotsPrices();
+        for (Map.Entry<Long, Integer> entry : prices.entrySet()) {
+            Long timeSlotID = entry.getKey();
+            Integer newPrice = entry.getValue();
+            timeSlotService.updateLastMarketPrice(timeSlotID, newPrice);
+        }
+
+        Map<String, Long> vDown = res.getvDown();
+        for (Map.Entry<String, Long> entry : vDown.entrySet()) {
+            String userLogin = entry.getKey();
+            Long timeSlotID = entry.getValue();
+            timeSlotService.removeUserFromTimeSlot(timeSlotID, userLogin);
+        }
+
+        Map<String, Long> vUp = res.getvUp();
+        for (Map.Entry<String, Long> entry : vUp.entrySet()) {
+            String userLogin = entry.getKey();
+            Long timeSlotID = entry.getValue();
+            timeSlotService.addUserToTimeSlot(timeSlotID, userLogin);
+        }
+
+        optimizationProcess.setOptimizationTime(LocalDateTime.now());
+
+        System.out.println("Zaktualizowano wartości");
 
         return ScheduleService.getOneSchedule(optimizationProcess.getProcessOwner().getGroup().getSchedulesList());
     }
