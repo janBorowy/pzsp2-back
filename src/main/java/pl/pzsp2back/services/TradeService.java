@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class TradeService {
     private final TradeRepository tradeRepository;
+    private final TradeOfferService tradeOfferService;
     private final UserService userService;
 
     @Transactional
@@ -73,16 +74,19 @@ public class TradeService {
     }
 
 
+    public Trade getTradeFromOffer(Long id) {
+        var to = tradeOfferService.getTradeOffer(id);
+        return getTradeFromOffer(to);
+    }
 
-
-    public Trade getTradeFromOffer(TradeOffer offer) {
+    private Trade getTradeFromOffer(TradeOffer offer) {
         Trade trade = tradeRepository.findTradeBySellerOffer(offer);
         if (trade==null) {
             trade = tradeRepository.findTradeByBuyerOffer(offer);
         }
 
         if (trade == null) {
-            throw new RuntimeException("Offer is not realized.");
+            throw new RuntimeException("Offer is not realized (Missing Trade for this offer).");
         }
         return trade;
     }
