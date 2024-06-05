@@ -6,6 +6,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.Time;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -44,6 +45,8 @@ public class Mapper {
         List<String> wantDownUniqueLogins = wantDownOffers.stream()
                 .map(TradeOffer::getOfferOwner)
                 .map(User::getLogin)
+                .collect(Collectors.toSet())
+                .stream()
                 .sorted()
                 .toList();
         List<TradeOffer> canDownOffers = validOffers.stream()
@@ -132,7 +135,7 @@ public class Mapper {
         }
 
         try {
-            writeMinLSlotow(file_handler, allLoginsSorted, wantDownOffers);
+            writeMinLSlotow(file_handler, allLoginsSorted, timeslots, uniqueSortedTimeslotIds);
         } catch (IOException e) {
             System.out.println("Error during mapping minLSlotow");
             e.printStackTrace();
@@ -345,13 +348,19 @@ public class Mapper {
         writer.close();
     }
 
-    public void writeMinLSlotow(File handler, List<String> uniqueLogins, List<TradeOffer> wantDownTradeOffers) throws IOException {
+    public void writeMinLSlotow(File handler, List<String> uniqueLogins, List<TimeSlot> allTimeSlots, List<Long> uniqueSlotsID) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(handler, true));
         writer.write("param minLSlotow:=\n");
         HashMap<String, Integer> loginCounts = new HashMap<>();
-        for (TradeOffer offer : wantDownTradeOffers) {
-            String ownerLogin = offer.getOfferOwner().getLogin();
-            loginCounts.put(ownerLogin, loginCounts.getOrDefault(ownerLogin, 0) + 1);
+        for (Long slotId : uniqueSlotsID) {
+            Optional<TimeSlot> t = allTimeSlots.stream()
+                    .filter(ts -> ts.getId().equals(slotId))
+                    .findFirst();
+            List<User> us = t.get().getUsers();
+            for(User user : us){
+                String ownerLogin = user.getLogin();
+                loginCounts.put(ownerLogin, loginCounts.getOrDefault(ownerLogin, 0) + 1);
+            }
         }
         for (String login : uniqueLogins) {
             writer.write("\"" + login + "\" ");

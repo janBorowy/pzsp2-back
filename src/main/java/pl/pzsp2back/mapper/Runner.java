@@ -1,17 +1,21 @@
 package pl.pzsp2back.mapper;
 
+import org.antlr.v4.runtime.misc.MultiMap;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Runner {
     public Result runAmpl(Long groupId) {
         Map<Long, Integer> timeSlotsPrices = new HashMap<>();
-        Map<String, Long> vUp = new HashMap<>();
-        Map<String, Long> vDown = new HashMap<>();
+        MultiMap<Long, String> vUp = new MultiMap<>();
+        MultiMap<Long, String> vDown = new MultiMap<>();
 
         try {
             // Uruchomienie komendy ampl
@@ -79,8 +83,14 @@ public class Runner {
                     String login = parts[0].replaceAll("'", "");
                     Long timeSlotId = Long.parseLong(parts[1].replaceAll("'", ""));
                     Integer value = Integer.parseInt(parts[2]);
-                    if (value == 1){
-                        vDown.put(login, timeSlotId);
+                    if (value == 1) {
+                        List<String> logins = vDown.get(timeSlotId);
+                        if (logins == null) {
+                            logins = new ArrayList<>();
+                            vDown.put(timeSlotId, logins);
+                        }
+                        logins.add(login);
+                        vDown.put(timeSlotId, logins);
                     }
                 }
                 line = reader.readLine();
@@ -97,8 +107,14 @@ public class Runner {
                     String login = parts[0].replaceAll("'", "");
                     Long timeSlotId = Long.parseLong(parts[1].replaceAll("'", ""));
                     Integer value = Integer.parseInt(parts[2]);
-                    if (value == 1){
-                        vUp.put(login, timeSlotId);
+                    if (value == 1) {
+                        List<String> logins = vUp.get(timeSlotId);
+                        if (logins == null) {
+                            logins = new ArrayList<>();
+                            vUp.put(timeSlotId, logins);
+                        }
+                        logins.add(login);
+                        vUp.put(timeSlotId, logins);
                     }
                 }
                 line = reader.readLine();

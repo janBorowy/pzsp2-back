@@ -103,71 +103,22 @@ public class DatabaseLoader implements CommandLineRunner {
             worker1worker2DtoList.add(worker2Dto);
 
 
-
-            TimeSlotDto timeslot1Dto = new TimeSlotDto(null, LocalDateTime.of(2024, 5, 6, 10, 30), 1, 0, null, null, worker1DtoList, null);
-            TimeSlot ts1 = timeSlotService.createTimeSlot(timeslot1Dto);
-
-            TimeSlotDto timeslot2Dto = new TimeSlotDto(null, LocalDateTime.of(2024, 5, 7, 8, 30), 6, 0, null, null, worker1DtoList, null);
-            TimeSlot ts2 = this.timeSlotService.createTimeSlot(timeslot2Dto);
-
-
-            TimeSlotDto timeslot3Dto = new TimeSlotDto(null, LocalDateTime.of(2024, 5, 8, 11, 0), 2, 0, null, null, worker1worker2DtoList, null);
-            TimeSlot ts3 = this.timeSlotService.createTimeSlot(timeslot3Dto);
-
-            TimeSlotDto timeslot4Dto = new TimeSlotDto(null, LocalDateTime.of(2024, 5, 9, 9, 30), 5, 0, null, null, worker4DtoList, null);
-            TimeSlot ts4 = timeSlotService.createTimeSlot(timeslot4Dto);
-
-            TimeSlotDto timeslot5Dto = new TimeSlotDto(null, LocalDateTime.of(2024, 5, 10, 15, 30), 8, 0, null, null, worker3DtoList, null);
-            TimeSlot ts5 = this.timeSlotService.createTimeSlot(timeslot5Dto);
-
-            TimeSlotDto timeslot6Dto = new TimeSlotDto(null, LocalDateTime.of(2024, 5, 9, 8, 0), 3, 0, null, null, worker2DtoList, null);
-            TimeSlot ts6 = this.timeSlotService.createTimeSlot(timeslot6Dto);
-
-            TimeSlotDto timeslot7Dto = new TimeSlotDto(null, LocalDateTime.of(2024, 5, 9, 13, 0), 3, 0, null, null, worker3DtoList, null);
-            TimeSlot ts7 = this.timeSlotService.createTimeSlot(timeslot7Dto);
-
-            TimeSlotDto timeslot8Dto = new TimeSlotDto(null, LocalDateTime.of(2024, 5, 6, 13, 0), 3, 0, null, null, worker3DtoList, null);
-            TimeSlot ts8 = this.timeSlotService.createTimeSlot(timeslot8Dto);
-
-            TimeSlotDto timeslot9Dto = new TimeSlotDto(null, LocalDateTime.of(2024, 5, 6, 18, 0), 3, 0, null, null, worker4DtoList, null);
-            TimeSlot ts9 = this.timeSlotService.createTimeSlot(timeslot9Dto);
-
-            TimeSlotDto timeslot10Dto = new TimeSlotDto(null, LocalDateTime.of(2024, 5, 7, 15, 0), 3, 0, null, null, worker4DtoList, null);
-            TimeSlot ts10 = this.timeSlotService.createTimeSlot(timeslot10Dto);
-
             OptimizationProcessPostDto op1 = new OptimizationProcessPostDto(LocalDateTime.of(2024, 5, 11, 23,50), null);
             OptimizationProcess op = this.optimizationProcessService.createOptimizationProcess(op1, "admin");
 
-            OfferStatus o = OfferStatus.ACTIVE;
-            TradeOfferPostDto tradeOffer1 = new TradeOfferPostDto(10, ts1.getId(), true, op.getId());
-            this.tradeOfferService.createTradeOffer(tradeOffer1, "worker1"); //wantDown worker1
 
-            TradeOfferPostDto tradeOffer2 = new TradeOfferPostDto(10, ts1.getId(), false, op.getId());
-            this.tradeOfferService.createTradeOffer(tradeOffer2, "worker2"); //canUp worker 2
 
-            TradeOfferPostDto tradeOffer6 = new TradeOfferPostDto(10, ts6.getId(), true, op.getId());
-            this.tradeOfferService.createTradeOffer(tradeOffer6, "worker2"); //wantDown worker 2
+            //TradeOfferPostDto tradeOffer6 = new TradeOfferPostDto(22, ts10.getId(), false, op.getId());
+            //this.tradeOfferService.createTradeOffer(tradeOffer6, "worker3"); //canUp worker 3
 
-            TradeOfferPostDto tradeOffer3 = new TradeOfferPostDto(10, ts4.getId(), false, op.getId());
-            this.tradeOfferService.createTradeOffer(tradeOffer3, "worker1"); //canUp worker 1
+            //TradeOfferPostDto tradeOffer7 = new TradeOfferPostDto(15, ts7.getId(), true, op.getId());
+            //this.tradeOfferService.createTradeOffer(tradeOffer7, "worker3"); //wantDown worker 3
 
-            TradeOfferPostDto tradeOffer4 = new TradeOfferPostDto(10, ts4.getId(), true, op.getId());
-            this.tradeOfferService.createTradeOffer(tradeOffer4, "worker4"); //wantDown worker 4
+            //TradeOfferPostDto tradeOffer8 = new TradeOfferPostDto(10, ts3.getId(), true, op.getId());
+            //this.tradeOfferService.createTradeOffer(tradeOffer8, "worker2"); //wantDown worker2
 
-            TradeOfferPostDto tradeOffer5 = new TradeOfferPostDto(10, ts6.getId(), false, op.getId());
-            this.tradeOfferService.createTradeOffer(tradeOffer5, "worker4"); //canUp worker 4
-
-            TradeOfferPostDto tradeOffer10 = new TradeOfferPostDto(20, ts2.getId(), false, op.getId());
-            this.tradeOfferService.createTradeOffer(tradeOffer10, "worker3"); //canUp worker 3
-
-            TradeOfferPostDto tradeOffer7 = new TradeOfferPostDto(20, ts8.getId(), true, op.getId());
-            this.tradeOfferService.createTradeOffer(tradeOffer7, "worker3"); //wantDown worker 3
-
-            TradeOfferPostDto tradeOffer8 = new TradeOfferPostDto(20, ts2.getId(), true, op.getId());
-            this.tradeOfferService.createTradeOffer(tradeOffer8, "worker1"); //wantDown worker1
-
-            TradeOfferPostDto tradeOffer9 = new TradeOfferPostDto(20, ts8.getId(), false, op.getId());
-            this.tradeOfferService.createTradeOffer(tradeOffer9, "worker1"); //canUp worker 1
+            //TradeOfferPostDto tradeOffer8 = new TradeOfferPostDto(43, ts7.getId(), false, op.getId());
+            //this.tradeOfferService.createTradeOffer(tradeOffer8, "worker2"); //canUp worker 2
 
         }
 
