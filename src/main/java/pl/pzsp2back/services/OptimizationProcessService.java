@@ -2,12 +2,11 @@ package pl.pzsp2back.services;
 
 
 import lombok.AllArgsConstructor;
-import org.springframework.boot.autoconfigure.quartz.QuartzTransactionManager;
-import org.springframework.context.annotation.Lazy;
+import org.antlr.v4.runtime.misc.MultiMap;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.pzsp2back.dto.TimeSlotDto;
 import pl.pzsp2back.dtoPost.OptimizationProcessPostDto;
+import pl.pzsp2back.dtoPost.TradePostDto;
 import pl.pzsp2back.exceptions.OptimizationProcessServiceException;
 import pl.pzsp2back.mapper.Mapper;
 import pl.pzsp2back.mapper.Result;
@@ -15,9 +14,7 @@ import pl.pzsp2back.mapper.Runner;
 import pl.pzsp2back.orm.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -26,7 +23,7 @@ public class OptimizationProcessService {
     private final OptimizationProcessRepository optimizationProcessRepository;
 
     private UserService userService;
-    private TimeSlotService timeSlotService;
+    private TradeService tradeService;
 
     @Transactional
     public OptimizationProcess createOptimizationProcess(OptimizationProcessPostDto optimizationProcessPostDto, String login) {
@@ -157,28 +154,59 @@ public class OptimizationProcessService {
         Result res = runner.runAmpl(optimizationProcess.getProcessOwner().getGroup().getId());
         System.out.println(res);
 
+
         Map<Long, Integer> prices = res.getTimeSlotsPrices();
-        for (Map.Entry<Long, Integer> entry : prices.entrySet()) {
-            Long timeSlotID = entry.getKey();
-            Integer newPrice = entry.getValue();
-            timeSlotService.updateLastMarketPrice(timeSlotID, newPrice);
+        MultiMap <Long, String> vDown = res.getvDown(); //seller
+        MultiMap <Long, String> vUp = res.getvUp(); //buyer
+
+        // Create a set of unique time slot IDs
+        Set<Long> allTimeSlotIDs = new HashSet<>(prices.keySet());
+
+        // Convert vUp.values() and vDown.values() to sets
+        Set<Long> vDownIDs = new HashSet<>(vDown.keySet());
+        Set<Long> vUpIDs = new HashSet<>(vUp.keySet());
+
+
+
+        // Check if all sets contain the same IDs
+        boolean areSame = allTimeSlotIDs.equals(vDownIDs) && allTimeSlotIDs.equals(vUpIDs);
+
+        if(!areSame) {
+            throw new OptimizationProcessServiceException("Error in ampl data. IDs in vUp, vDown na prices are different.");
         }
 
-        Map<String, Long> vDown = res.getvDown();
-        for (Map.Entry<String, Long> entry : vDown.entrySet()) {
-            String userLogin = entry.getKey();
-            Long timeSlotID = entry.getValue();
-            timeSlotService.removeUserFromTimeSlot(timeSlotID, userLogin);
+        for (Long tsId : allTimeSlotIDs) {
+            List<String> sellers = vDown.get(tsId);
+            List<String> buyers = vUp.get(tsId);
+            Integer price = prices.get(tsId);
+            if(sellers.size() != buyers.size()) {
+                throw new OptimizationProcessServiceException("The size of buyers and sellers for one timeslot are not equal");
+            }
+
+            for (int i = 0; i < sellers.size(); i++) {
+                tradeService.createTrade(new TradePostDto(tsId, sellers.get(i), buyers.get(i), price));
+            }
         }
 
-        Map<String, Long> vUp = res.getvUp();
-        for (Map.Entry<String, Long> entry : vUp.entrySet()) {
-            String userLogin = entry.getKey();
-            Long timeSlotID = entry.getValue();
-            timeSlotService.addUserToTimeSlot(timeSlotID, userLogin);
-        }
+//        for (Map.Entry<Long, Integer> entry : prices.entrySet()) {
+//            Long timeSlotID = entry.getKey();
+//            Integer newPrice = entry.getValue();
+//            timeSlotService.updateLastMarketPrice(timeSlotID, newPrice);
+//        }
+//
+//        for (Map.Entry<String, Long> entry : vDown.entrySet()) { //seller
+//            String userLogin = entry.getKey();
+//            Long timeSlotID = entry.getValue();
+//            timeSlotService.removeUserFromTimeSlot(timeSlotID, userLogin);
+//        }
+//
+//        for (Map.Entry<String, Long> entry : vUp.entrySet()) { //buyer
+//            String userLogin = entry.getKey();
+//            Long timeSlotID = entry.getValue();
+//            timeSlotService.addUserToTimeSlot(timeSlotID, userLogin);
+//        }
 
-        optimizationProcess.setOptimizationTime(LocalDateTime.now());
+//        optimizationProcess.setOptimizationTime(LocalDateTime.now());
 
         System.out.println("Zaktualizowano wartości");
 

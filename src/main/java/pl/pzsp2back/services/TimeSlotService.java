@@ -162,4 +162,5 @@ public class TimeSlotService {
         timeslot.getUsers().add(userToAdd);
         return timeslotRepository.save(timeslot);
     }
+
 }

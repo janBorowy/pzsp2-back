@@ -5,6 +5,13 @@ Authorization: Bearer {{admin_token}}
 {
 }
 
+> {%
+client.test("Request should return 200", function() {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+});
+client.global.set("optimization_process_id", response.body.id);
+%}
+
 ### update optimization process all data
 PUT http://localhost:8080/optimizationProcess/
 Content-Type: application/json
@@ -24,6 +31,32 @@ Authorization: Bearer {{admin_token}}
 {
   "offerAcceptanceDeadline": "2024-06-10T18:06:07.218Z"
 }
+
+
+### run optimization
+GET {{url}}/optimizationProcess/run/{{optimization_process_id}}
+Accept: application/json
+Authorization: Bearer {{admin_token}}
+
+
+> {%
+client.test("Request should return 200", function() {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+});
+%}
+
+
+### run optimization from user account expected ERROR
+GET {{url}}/optimizationProcess/run/{{optimization_process_id}}
+Accept: application/json
+Authorization: Bearer {{worker1_token}}
+
+
+> {%
+client.test("Request should return 403", function() {
+    client.assert(response.status === 403, "Expected status 403, but got " + response.status);
+});
+%}
 
 ### try update optimization process with invalid data
 PUT http://localhost:8080/optimizationProcess/
@@ -83,6 +116,8 @@ client.test("Request should return 403", function() {
     client.assert(response.status === 403, "Expected status 403, but got " + response.status);
 });
 %}
+
+
 
 
 #### create optimization process with optimization time
