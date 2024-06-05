@@ -6,6 +6,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -131,7 +132,7 @@ public class Mapper {
         }
 
         try {
-            writeMinLSlotow(file_handler, allLoginsSorted);
+            writeMinLSlotow(file_handler, allLoginsSorted, wantDownOffers);
         } catch (IOException e) {
             System.out.println("Error during mapping minLSlotow");
             e.printStackTrace();
@@ -344,12 +345,18 @@ public class Mapper {
         writer.close();
     }
 
-    public void writeMinLSlotow(File handler, List<String> uniqueLogins) throws IOException {
+    public void writeMinLSlotow(File handler, List<String> uniqueLogins, List<TradeOffer> wantDownTradeOffers) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(handler, true));
         writer.write("param minLSlotow:=\n");
-        for(String login: uniqueLogins){
+        HashMap<String, Integer> loginCounts = new HashMap<>();
+        for (TradeOffer offer : wantDownTradeOffers) {
+            String ownerLogin = offer.getOfferOwner().getLogin();
+            loginCounts.put(ownerLogin, loginCounts.getOrDefault(ownerLogin, 0) + 1);
+        }
+        for (String login : uniqueLogins) {
             writer.write("\"" + login + "\" ");
-            writer.write("0\n");
+            int count = loginCounts.getOrDefault(login, 0);
+            writer.write(count + "\n");
         }
         writer.write(";\n\n");
         writer.close();
