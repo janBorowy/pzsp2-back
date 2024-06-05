@@ -2,16 +2,12 @@ package pl.pzsp2back.services;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import pl.pzsp2back.dto.DtoMapper;
 import pl.pzsp2back.dto.UserDto;
-import pl.pzsp2back.dto.UserShortDto;
 import pl.pzsp2back.exceptions.UserServiceException;
-import pl.pzsp2back.orm.Group;
 import pl.pzsp2back.orm.User;
 import pl.pzsp2back.orm.UserRepository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -53,6 +49,16 @@ public class UserService {
         }
         return users;
     }
+
+
+    //+ balance means adding to user balance and -balance is substracting from acutal balance
+    public User addUserBalance(String login, Integer balance) {
+        User user = findUserByLogin(login);
+        user.setBalance(user.getBalance() + balance);
+        return userRepository.save(user);
+
+    }
+
 
     public boolean ifSameGroup(String login1, String login2) {
         User user1 = getUser(login1);

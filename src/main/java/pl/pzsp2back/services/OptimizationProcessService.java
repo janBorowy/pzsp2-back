@@ -21,6 +21,7 @@ import java.util.*;
 public class OptimizationProcessService {
 
     private final OptimizationProcessRepository optimizationProcessRepository;
+    private final TradeOfferRepository tradeOfferRepository;
 
     private UserService userService;
     private TradeService tradeService;
@@ -188,25 +189,15 @@ public class OptimizationProcessService {
             }
         }
 
-//        for (Map.Entry<Long, Integer> entry : prices.entrySet()) {
-//            Long timeSlotID = entry.getKey();
-//            Integer newPrice = entry.getValue();
-//            timeSlotService.updateLastMarketPrice(timeSlotID, newPrice);
-//        }
-//
-//        for (Map.Entry<String, Long> entry : vDown.entrySet()) { //seller
-//            String userLogin = entry.getKey();
-//            Long timeSlotID = entry.getValue();
-//            timeSlotService.removeUserFromTimeSlot(timeSlotID, userLogin);
-//        }
-//
-//        for (Map.Entry<String, Long> entry : vUp.entrySet()) { //buyer
-//            String userLogin = entry.getKey();
-//            Long timeSlotID = entry.getValue();
-//            timeSlotService.addUserToTimeSlot(timeSlotID, userLogin);
-//        }
+        //make to inactive all offers which are still active
+        var allTradeOffers = optimizationProcess.getTradeOffersList();
+        for (TradeOffer tradeOffer : allTradeOffers) {
+            if (tradeOffer.getStatus().equals(OfferStatus.ACTIVE)) {
+                tradeOffer.setStatus(OfferStatus.NEGATIVE_REALIZED);
+                tradeOfferRepository.save(tradeOffer);
+            }
 
-//        optimizationProcess.setOptimizationTime(LocalDateTime.now());
+        }
 
         System.out.println("Zaktualizowano wartości");
 
@@ -229,7 +220,7 @@ public class OptimizationProcessService {
 
     private OptimizationProcess findOptimizationProcessById(Long id) {
         Optional<OptimizationProcess> optimizationProcess = optimizationProcessRepository.findById(id);
-        if(!optimizationProcess.isPresent()) {
+        if(!optimizationProcess.isEmpty()) {
             throw new OptimizationProcessServiceException("Optimization process doesn't exist with id: " + id);
         } else {
             return optimizationProcess.get();

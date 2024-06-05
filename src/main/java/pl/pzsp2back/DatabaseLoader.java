@@ -6,14 +6,12 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import pl.pzsp2back.dto.SignUpDto;
 import pl.pzsp2back.dto.TimeSlotDto;
-import pl.pzsp2back.dto.TradeOfferDto;
 import pl.pzsp2back.dto.UserShortDto;
 import pl.pzsp2back.dtoPost.OptimizationProcessPostDto;
 import pl.pzsp2back.dtoPost.TradeOfferPostDto;
 import pl.pzsp2back.exceptions.UserAlreadyExistsException;
 import pl.pzsp2back.orm.*;
 
-import java.sql.Time;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -58,7 +56,7 @@ public class DatabaseLoader implements CommandLineRunner {
         var worker3SignUpDto =
                 new SignUpDto("worker3", "password3", "worker3@worker.com", "Robert", "Robert", testGroup.getId(), 100);
         var worker4SignUpDto =
-                new SignUpDto("worker4", "password4", "worker4@worker.com", "Mikołaj", "Mikołaj", testGroup.getId(), 300);
+                new SignUpDto("worker4", "password4", "worker4@worker.com", "Mikolaj", "Lukasz", testGroup.getId(), 300);
 
 
 
@@ -85,6 +83,10 @@ public class DatabaseLoader implements CommandLineRunner {
         if (testSchedule == null) {
             // id, baseSlotLength, name, tag, group, timeSlotList
             testSchedule = this.scheduleRepository.save(new Schedule(null, 60, "19 week", "test", testGroup, null, null));
+
+            OptimizationProcessPostDto op1 = new OptimizationProcessPostDto(LocalDateTime.of(2024, 5, 11, 23,50), null);
+            OptimizationProcess op = this.optimizationProcessService.createOptimizationProcess(op1, "admin");
+
 
             List<UserShortDto> worker1DtoList = new ArrayList<>();
             worker1DtoList.add(worker1Dto);
@@ -135,8 +137,7 @@ public class DatabaseLoader implements CommandLineRunner {
             TimeSlotDto timeslot10Dto = new TimeSlotDto(null, LocalDateTime.of(2024, 5, 7, 15, 0), 3, 0, null, null, worker4DtoList, null);
             TimeSlot ts10 = this.timeSlotService.createTimeSlot(timeslot10Dto);
 
-            OptimizationProcessPostDto op1 = new OptimizationProcessPostDto(LocalDateTime.of(2024, 5, 11, 23,50), null);
-            OptimizationProcess op = this.optimizationProcessService.createOptimizationProcess(op1, "admin");
+
 
             OfferStatus o = OfferStatus.ACTIVE;
             TradeOfferPostDto tradeOffer1 = new TradeOfferPostDto(10, ts1.getId(), true, op.getId());
@@ -168,6 +169,54 @@ public class DatabaseLoader implements CommandLineRunner {
 
             TradeOfferPostDto tradeOffer9 = new TradeOfferPostDto(20, ts8.getId(), false, op.getId());
             this.tradeOfferService.createTradeOffer(tradeOffer9, "worker1"); //canUp worker 1
+
+        }
+
+        Group testGroup2 = this.groupRepository.findByName("Test2");
+
+        if (testGroup2 == null) {
+            testGroup2 = this.groupRepository.save(new Group(null, "Test2", null, null));;
+        }
+
+
+        var admin2Dto = new SignUpDto("admin2", "adminpass2", "admin@admin.com", "Marek2", "Racibor2", testGroup2.getId(), 5000);
+        var worker12SignUpDto =
+                new SignUpDto("worker12", "password12", "worker12@worker.com", "Adam2", "Camerun2", testGroup2.getId(), 1000);
+        var worker22SignUpDto =
+                new SignUpDto("worker22", "password22", "worker22@worker.com", "Pawel2", "Mata2", testGroup2.getId(), 1000);
+        var worker32SignUpDto =
+                new SignUpDto("worker32", "password32", "worker32@worker.com", "Robert2", "Robert2", testGroup2.getId(), 1000);
+
+
+
+
+        tryToSignUp(admin2Dto);
+        tryToSignUp(worker12SignUpDto);
+        tryToSignUp(worker22SignUpDto);
+        tryToSignUp(worker32SignUpDto);
+
+
+        UserShortDto worker12Dto = new UserShortDto(worker1SignUpDto.login(), worker1SignUpDto.name(), worker1SignUpDto.surname());
+        UserShortDto worker22Dto = new UserShortDto(worker2SignUpDto.login(), worker2SignUpDto.name(), worker2SignUpDto.surname());
+        UserShortDto worker32Dto = new UserShortDto(worker3SignUpDto.login(), worker3SignUpDto.name(), worker3SignUpDto.surname());
+
+        var admin2 = userRepository.findById(adminDto.login()).get();
+        var worker12 = userRepository.findById(worker12SignUpDto.login()).get();
+        var worker22 = userRepository.findById(worker22SignUpDto.login()).get();
+        var worker32 = userRepository.findById(worker32SignUpDto.login()).get();
+        admin2.setIfAdmin(true);
+        userRepository.save(admin2);
+
+
+
+
+        Schedule testSchedule2 = this.scheduleRepository.findByTag("test2");
+        if (testSchedule2 == null) {
+            // id, baseSlotLength, name, tag, group, timeSlotList
+            testSchedule2 = this.scheduleRepository.save(new Schedule(null, 60, "Schedule for small group", "test2", testGroup2, null, null));
+
+            OptimizationProcessPostDto op12 = new OptimizationProcessPostDto(LocalDateTime.of(2024, 5, 11, 23,50), null);
+            OptimizationProcess op2 = this.optimizationProcessService.createOptimizationProcess(op12, "admin2");
 
         }
 
