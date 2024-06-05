@@ -1,0 +1,4 @@
+### get trades
+GET {{url}}/trade/all
+Accept: application/json
+Authorization: Bearer {{admin_token}}

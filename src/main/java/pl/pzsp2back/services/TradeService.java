@@ -81,8 +81,13 @@ public class TradeService {
         timeSlotService.removeUserFromTimeSlot(tradePostDto.timeSlotId(), tradePostDto.sellerLogin());
         timeSlotService.addUserToTimeSlot(tradePostDto.timeSlotId(), tradePostDto.buyerLogin());
         timeSlotService.updateLastMarketPrice(tradePostDto.timeSlotId(), tradePostDto.price());
+
+        userService.addUserBalance(tradePostDto.sellerLogin(), tradePostDto.price());
+        userService.addUserBalance(tradePostDto.buyerLogin(), -tradePostDto.price());
+
         var buyerOffer = updateStatus(tradePostDto.timeSlotId(), tradePostDto.buyerLogin(), OfferStatus.POSITIVE_REALIZED);
         var sellerOffer= updateStatus(tradePostDto.timeSlotId(), tradePostDto.sellerLogin(), OfferStatus.POSITIVE_REALIZED);
+
 
         Trade trade = new Trade(null, tradePostDto.price(), LocalDateTime.now(), buyerOffer.getOptimizationProcess(), sellerOffer, buyerOffer);
         return tradeRepository.save(trade);
