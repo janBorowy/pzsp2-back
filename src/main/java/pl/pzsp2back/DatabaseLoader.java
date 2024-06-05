@@ -28,11 +28,8 @@ public class DatabaseLoader implements CommandLineRunner {
     private final GroupRepository groupRepository;
     private final AuthService authService;
     private final ScheduleRepository scheduleRepository;
-    private final TimeslotRepository timeslotRepository;
     private final UserRepository userRepository;
-    private final OptimizationProcessRepository optimizationProcessRepository;
-    private final TradeOfferRepository tradeOfferRepository;
-    private final TradeRepository tradeRepository;
+
 
     private final TimeSlotService timeSlotService;
     private final TradeOfferService tradeOfferService;
@@ -50,13 +47,13 @@ public class DatabaseLoader implements CommandLineRunner {
 
         var adminDto = new SignUpDto("admin", "adminpass", "admin@admin.com", "Marek", "Racibor", testGroup.getId(), 100);
         var worker1SignUpDto =
-                new SignUpDto("worker1", "password1", "worker@worker.com", "Adam", "Camerun", testGroup.getId(), 100);
+                new SignUpDto("worker1", "password1", "worker@worker.com", "Adam", "Camerun", testGroup.getId(), 1000);
         var worker2SignUpDto =
-                new SignUpDto("worker2", "password2", "worker1@worker.com", "Pawel", "Mata", testGroup.getId(), 300);
+                new SignUpDto("worker2", "password2", "worker1@worker.com", "Pawel", "Mata", testGroup.getId(), 3000);
         var worker3SignUpDto =
-                new SignUpDto("worker3", "password3", "worker3@worker.com", "Robert", "Robert", testGroup.getId(), 100);
+                new SignUpDto("worker3", "password3", "worker3@worker.com", "Robert", "Robert", testGroup.getId(), 1000);
         var worker4SignUpDto =
-                new SignUpDto("worker4", "password4", "worker4@worker.com", "Mikolaj", "Lukasz", testGroup.getId(), 300);
+                new SignUpDto("worker4", "password4", "worker4@worker.com", "Mikolaj", "Lukasz", testGroup.getId(), 3000);
 
 
 
@@ -194,7 +191,7 @@ public class DatabaseLoader implements CommandLineRunner {
         UserShortDto worker22Dto = new UserShortDto(worker2SignUpDto.login(), worker2SignUpDto.name(), worker2SignUpDto.surname());
         UserShortDto worker32Dto = new UserShortDto(worker3SignUpDto.login(), worker3SignUpDto.name(), worker3SignUpDto.surname());
 
-        var admin2 = userRepository.findById(adminDto.login()).get();
+        var admin2 = userRepository.findById(admin2Dto.login()).get();
         var worker12 = userRepository.findById(worker12SignUpDto.login()).get();
         var worker22 = userRepository.findById(worker22SignUpDto.login()).get();
         var worker32 = userRepository.findById(worker32SignUpDto.login()).get();

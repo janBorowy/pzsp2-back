@@ -22,6 +22,7 @@ public class OptimizationProcessService {
 
     private final OptimizationProcessRepository optimizationProcessRepository;
     private final TradeOfferRepository tradeOfferRepository;
+    private final TimeslotRepository timeslotRepository;
 
     private UserService userService;
     private TradeService tradeService;
@@ -176,6 +177,14 @@ public class OptimizationProcessService {
             throw new OptimizationProcessServiceException("Error in ampl data. IDs in vUp, vDown na prices are different.");
         }
 
+
+        for(Long timeSlotId : prices.keySet()) {
+            var ts = timeslotRepository.findById(timeSlotId).get();
+            ts.setLastMarketPrice(prices.get(timeSlotId));
+            timeslotRepository.save(ts);
+        }
+
+
         for (Long tsId : allTimeSlotIDs) {
             List<String> sellers = vDown.get(tsId);
             if(sellers == null){sellers = new ArrayList<>();}
@@ -185,11 +194,11 @@ public class OptimizationProcessService {
             if(sellers.size() != buyers.size()) {
                 throw new OptimizationProcessServiceException("The size of buyers and sellers for one timeslot are not equal");
             }
-
             for (int i = 0; i < sellers.size(); i++) {
                 tradeService.createTrade(new TradePostDto(tsId, sellers.get(i), buyers.get(i), price));
             }
         }
+
 
         //make to inactive all offers which are still active
         var allTradeOffers = optimizationProcess.getTradeOffersList();
