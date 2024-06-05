@@ -161,15 +161,15 @@ public class OptimizationProcessService {
 
         // Create a set of unique time slot IDs
         Set<Long> allTimeSlotIDs = new HashSet<>(prices.keySet());
+        Set<Long> vUpIDs = new HashSet<>(vUp.keySet());
 
         // Convert vUp.values() and vDown.values() to sets
         Set<Long> vDownIDs = new HashSet<>(vDown.keySet());
-        Set<Long> vUpIDs = new HashSet<>(vUp.keySet());
 
 
 
         // Check if all sets contain the same IDs
-        boolean areSame = allTimeSlotIDs.equals(vDownIDs) && allTimeSlotIDs.equals(vUpIDs);
+        boolean areSame = vUpIDs.equals(vDownIDs);
 
         if(!areSame) {
             throw new OptimizationProcessServiceException("Error in ampl data. IDs in vUp, vDown na prices are different.");
@@ -177,7 +177,9 @@ public class OptimizationProcessService {
 
         for (Long tsId : allTimeSlotIDs) {
             List<String> sellers = vDown.get(tsId);
+            if(sellers == null){sellers = new ArrayList<>();}
             List<String> buyers = vUp.get(tsId);
+            if(buyers == null){buyers = new ArrayList<>();}
             Integer price = prices.get(tsId);
             if(sellers.size() != buyers.size()) {
                 throw new OptimizationProcessServiceException("The size of buyers and sellers for one timeslot are not equal");

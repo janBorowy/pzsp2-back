@@ -163,9 +163,6 @@ public class DatabaseLoader implements CommandLineRunner {
             TradeOfferPostDto tradeOffer7 = new TradeOfferPostDto(20, ts8.getId(), true, op.getId());
             this.tradeOfferService.createTradeOffer(tradeOffer7, "worker3"); //wantDown worker 3
 
-            TradeOfferPostDto tradeOffer8 = new TradeOfferPostDto(20, ts2.getId(), true, op.getId());
-            this.tradeOfferService.createTradeOffer(tradeOffer8, "worker1"); //wantDown worker1
-
             TradeOfferPostDto tradeOffer9 = new TradeOfferPostDto(20, ts8.getId(), false, op.getId());
             this.tradeOfferService.createTradeOffer(tradeOffer9, "worker1"); //canUp worker 1
 
