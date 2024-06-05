@@ -84,10 +84,6 @@ public class DatabaseLoader implements CommandLineRunner {
             // id, baseSlotLength, name, tag, group, timeSlotList
             testSchedule = this.scheduleRepository.save(new Schedule(null, 60, "19 week", "test", testGroup, null, null));
 
-            OptimizationProcessPostDto op1 = new OptimizationProcessPostDto(LocalDateTime.of(2024, 5, 11, 23,50), null);
-            OptimizationProcess op = this.optimizationProcessService.createOptimizationProcess(op1, "admin");
-
-
             List<UserShortDto> worker1DtoList = new ArrayList<>();
             worker1DtoList.add(worker1Dto);
 
@@ -137,7 +133,8 @@ public class DatabaseLoader implements CommandLineRunner {
             TimeSlotDto timeslot10Dto = new TimeSlotDto(null, LocalDateTime.of(2024, 5, 7, 15, 0), 3, 0, null, null, worker4DtoList, null);
             TimeSlot ts10 = this.timeSlotService.createTimeSlot(timeslot10Dto);
 
-
+            OptimizationProcessPostDto op1 = new OptimizationProcessPostDto(LocalDateTime.of(2024, 5, 11, 23,50), null);
+            OptimizationProcess op = this.optimizationProcessService.createOptimizationProcess(op1, "admin");
 
             OfferStatus o = OfferStatus.ACTIVE;
             TradeOfferPostDto tradeOffer1 = new TradeOfferPostDto(10, ts1.getId(), true, op.getId());
