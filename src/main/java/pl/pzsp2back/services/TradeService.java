@@ -3,8 +3,10 @@ package pl.pzsp2back.services;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.pzsp2back.dtoPost.TradePostDto;
 import pl.pzsp2back.orm.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,7 +15,8 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class TradeService {
     private final TradeRepository tradeRepository;
-    private final TradeOfferService tradeOfferService;
+    private final TradeOfferRepository tradeOfferRepository;
+    private final TimeSlotService timeSlotService;
     private final UserService userService;
 
     @Transactional
@@ -73,11 +76,33 @@ public class TradeService {
         return buyOffers;
     }
 
+    @Transactional
+    public Trade createTrade(TradePostDto tradePostDto) {
+        timeSlotService.removeUserFromTimeSlot(tradePostDto.timeSlotId(), tradePostDto.sellerLogin());
+        timeSlotService.addUserToTimeSlot(tradePostDto.timeSlotId(), tradePostDto.buyerLogin());
+        timeSlotService.updateLastMarketPrice(tradePostDto.timeSlotId(), tradePostDto.price());
+        var buyerOffer = updateStatus(tradePostDto.timeSlotId(), tradePostDto.buyerLogin(), OfferStatus.POSITIVE_REALIZED);
+        var sellerOffer= updateStatus(tradePostDto.timeSlotId(), tradePostDto.sellerLogin(), OfferStatus.POSITIVE_REALIZED);
 
-    public Trade getTradeFromOffer(Long id) {
-        var to = tradeOfferService.getTradeOffer(id);
-        return getTradeFromOffer(to);
+        Trade trade = new Trade(null, tradePostDto.price(), LocalDateTime.now(), buyerOffer.getOptimizationProcess(), sellerOffer, buyerOffer);
+        return tradeRepository.save(trade);
     }
+
+    public TradeOffer updateStatus(Long timeSlotId, String ownerLogin, OfferStatus status) {
+        User user = userService.getUser(ownerLogin);
+        TimeSlot timeSlot = timeSlotService.getTimeSlot(timeSlotId);
+        TradeOffer tradeOffer = tradeOfferRepository.findTradeOfferByOfferOwnerAndTimeslot(user, timeSlot);
+        tradeOffer.setStatus(status);
+        tradeOffer.setTimestamp(LocalDateTime.now());
+        return tradeOfferRepository.save(tradeOffer);
+    }
+
+
+//    public Trade getTradeFromOffer(Long id) {
+//        var to = tradeOfferRepository.findById(id);
+//        return to;
+//    }
+
 
     private Trade getTradeFromOffer(TradeOffer offer) {
         Trade trade = tradeRepository.findTradeBySellerOffer(offer);
@@ -90,5 +115,5 @@ public class TradeService {
         }
         return trade;
     }
-
 }
+

@@ -7,4 +7,5 @@ import java.util.List;
 public interface TradeOfferRepository extends CrudRepository<TradeOffer, Long> {
     TradeOffer findTradeOfferByOptimizationProcessAndOfferOwnerAndTimeslot(OptimizationProcess optimizationProcess, User user, TimeSlot timeSlot);
     TradeOffer findByOfferOwnerAndTimeslot(User offerOwner, TimeSlot timeslot);
+    TradeOffer findTradeOfferByOfferOwnerAndTimeslot(User offerOwner, TimeSlot timeSlot);
 }

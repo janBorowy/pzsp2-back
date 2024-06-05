@@ -47,14 +47,13 @@ public class TradeOfferService {
 
         TradeOffer existingTradeOffer = tradeOfferRepository.findTradeOfferByOptimizationProcessAndOfferOwnerAndTimeslot(optimizationProcess, user, timeSlot);
 
-        if (optimizationProcess==null)
-        {
+        if (optimizationProcess == null) {
             throw new TradeOfferServiceException("Schedule doesn't have any up-to date optimization processes assigned.");
         }
 
 
-        if(existingTradeOffer != null) {
-            throw new TradeOfferServiceException("This trade offer already exists. Offer ID: "+existingTradeOffer.getId());
+        if (existingTradeOffer != null) {
+            throw new TradeOfferServiceException("This trade offer already exists. Offer ID: " + existingTradeOffer.getId());
         }
 
         Integer price = newOffer.price();
@@ -93,14 +92,14 @@ public class TradeOfferService {
         return offer;
     }
 
-    public boolean ifSameGroup(String login, Long offerId){
+    public boolean ifSameGroup(String login, Long offerId) {
         User user = userService.getUser(login);
         var ts = getTradeOffer(offerId);
         return ts.getOfferOwner().getGroup().getUsersList().stream().anyMatch(u -> u.getLogin().equals(login));
     }
 
 
-    public boolean ifOfferOwner(String login, Long offerId){
+    public boolean ifOfferOwner(String login, Long offerId) {
         var ts = getTradeOffer(offerId);
         return ts.getOfferOwner().getLogin().equals(login);
     }
@@ -122,16 +121,11 @@ public class TradeOfferService {
     }
 
     @Transactional
-    public TradeOffer updateTradeOfferStatus(Long id, OfferStatus status) {
-        TradeOffer offer = findTradeOfferById(id);
-        offer.setStatus(status);
-        return tradeOfferRepository.save(offer);
-    }
-
-    @Transactional
     public TradeOffer getTradeOfferByOwnerLoginAndTimeSlotId(String ownerLogin, Long timeSlotId) {
         User owner = userService.getUser(ownerLogin);
         TimeSlot timeSlot = timeSlotService.getTimeSlot(timeSlotId);
         return tradeOfferRepository.findByOfferOwnerAndTimeslot(owner, timeSlot);
     }
 }
+
+
